@@ -4,34 +4,52 @@ using Heuristics.TechEval.Core;
 using Heuristics.TechEval.Web.Models;
 using Heuristics.TechEval.Core.Models;
 using Newtonsoft.Json;
+using Heuristics.TechEval.Web.Services;
+using Heuristics.TechEval.Web.Services.Implementations;
+using System.Data;
+using System;
 
 namespace Heuristics.TechEval.Web.Controllers {
 
 	public class MembersController : Controller {
 
-		private readonly DataContext _context;
+		private readonly MemberService _memberService;
 
 		public MembersController() {
-			_context = new DataContext();
+			_memberService = new MemberService();
 		}
 
 		public ActionResult List() {
-			var allMembers = _context.Members.ToList();
+
+			var allMembers = _memberService.GetMembers();
 
 			return View(allMembers);
 		}
 
 		[HttpPost]
-		public ActionResult New(NewMember data) {
-			var newMember = new Member {
-				Name = data.Name,
-				Email = data.Email
-			};
+		public ActionResult New(MemberModel data) {
 
-			_context.Members.Add(newMember);
-			_context.SaveChanges();
+			var newMember = _memberService.AddMember(data);
 
 			return Json(JsonConvert.SerializeObject(newMember));
+		}
+
+		[HttpGet]
+		public ActionResult Edit(int Id)
+		{
+			// TODO: Add a check Id is not null
+
+			var memberToEdit = _memberService.GetMember(Id);
+
+			return PartialView("_Edit", memberToEdit);
+		}
+
+		[HttpPost]
+		public ActionResult Edit(MemberModel data)
+		{
+			var updatedMember = _memberService.UpdateMember(data);
+
+			return Json(JsonConvert.SerializeObject(updatedMember));
 		}
 	}
 }

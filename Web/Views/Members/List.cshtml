@@ -9,19 +9,21 @@
 <button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#NewMemberModal">Add Member</button>
 <table class="table table-striped table-bordered table-hover">
 	<thead>
-		<tr>
-			<th scope="col">#</th>
-			<th scope="col">Name</th>
-			<th scope="col">Email</th>
-		</tr>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Actions</th>
+        </tr>
 	</thead>
 	<tbody>
 	@foreach (var member in Model) {
-		<tr>
-			<th scope="row">@member.Id</th>
-			<td>@member.Name</td>
-			<td>@member.Email</td>
-		</tr>
+        <tr>
+            <th scope="row">@member.Id</th>
+            <td>@member.Name</td>
+            <td>@member.Email</td>
+            <td><a id="member-edit-link" data-toggle="modal" href="#EditMemberModal" onclick="loadMember(@member.Id)">Edit</a></td>
+        </tr>
 	}
 	</tbody>
 </table>
@@ -55,6 +57,26 @@
 	</div>
 </div>
 
+<div class="modal fade" id="EditMemberModal">
+    <div class="modal-dialog" role="document">
+        <form id="EditMemberForm" action="/Members/Edit" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Member</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="editMember-modal-body"></div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-primary" value="Save" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script type="text/javascript">
 	$(document).ready(function () {
 		$("#NewMemberForm").ajaxForm({
@@ -63,5 +85,22 @@
 				document.location.reload();
 			}
 		});
+        $("#EditMemberModal").ajaxForm({
+            success: function (formData, jqForm, options) {
+                // sure would be nice if we didn't have to reload the whole page...
+                document.location.reload();
+            }
+        });
 	});
+
+	function loadMember(memberId) {
+		$.ajax({
+            url: "@Url.Action("Edit")",
+            data: { id: memberId},
+            success: function (data) {
+                $("#editMember-modal-body").html(data);
+            }
+        });
+    }
+
 </script>
