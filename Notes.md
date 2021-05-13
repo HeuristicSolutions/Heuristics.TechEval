@@ -14,3 +14,15 @@
 - Shamelessly needed a refresher on passing data between views and EF
 - Decided it would be cleaner to move the data access into a separate service
     - Refactored a bit to make this possible (removed the DB context from the members controller and consolidated NewMember/EditMember models)
+
+## Task 2 - Validation
+
+- Almost finished setting up model state validation -- I couldn't get the validation messages to show up in the partial views
+- Added some basic jquery validation to both the New member and Edit member modal forms
+
+## Tips
+
+When you want to start with a fresh DB again, just run these two commands in the package management console:
+
+- `Update-Database -TargetMigration:0 -force` (destroy all tables and data)
+- `Update-Database` (seed the DB)

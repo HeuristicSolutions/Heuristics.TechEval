@@ -232,6 +232,7 @@
     <Content Include="Views\Categories\List.cshtml" />
     <Content Include="Views\Home\Setup.cshtml" />
     <Content Include="Views\Members\_Edit.cshtml" />
+    <Content Include="Views\Members\_New.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

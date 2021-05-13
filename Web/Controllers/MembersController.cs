@@ -26,8 +26,19 @@ namespace Heuristics.TechEval.Web.Controllers {
 			return View(allMembers);
 		}
 
+		[HttpGet]
+		public ActionResult New()
+		{
+			return PartialView("_New");
+		}
+
 		[HttpPost]
 		public ActionResult New(MemberModel data) {
+
+			if(!ModelState.IsValid)
+            {
+				return View();
+			}
 
 			var newMember = _memberService.AddMember(data);
 
