@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Heuristics.TechEval.Web.Services
 {
-    interface IMemberService
+    public interface IMemberService
     {
         List<Member> GetMembers();
         Member GetMember(int Id);

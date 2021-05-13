@@ -9,7 +9,7 @@ using System.Web;
 
 namespace Heuristics.TechEval.Web.Services.Implementations
 {
-    public class MemberService
+    public class MemberService : IMemberService
     {
         private readonly DataContext _context;
 

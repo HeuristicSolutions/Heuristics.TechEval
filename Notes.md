@@ -20,6 +20,15 @@
 - Almost finished setting up model state validation -- I couldn't get the validation messages to show up in the partial views
 - Added some basic jquery validation to both the New member and Edit member modal forms
 
+## Refactoring/Testing
+
+- Need to add some unit tests before going any further
+- I'll need to mock the new MemberService. To make this easier, I need to do dependency injection 
+  - Moq/NUnit/Unity.Mvc5
+- Ran into an issue with a test that dealt with validating Model State
+
+## Task 3 - Prevent duplicate email addresses
+
 ## Tips
 
 When you want to start with a fresh DB again, just run these two commands in the package management console:

@@ -13,10 +13,10 @@ namespace Heuristics.TechEval.Web.Controllers {
 
 	public class MembersController : Controller {
 
-		private readonly MemberService _memberService;
+		private readonly IMemberService _memberService;
 
-		public MembersController() {
-			_memberService = new MemberService();
+		public MembersController(IMemberService memberService) {
+			_memberService = memberService;
 		}
 
 		public ActionResult List() {
