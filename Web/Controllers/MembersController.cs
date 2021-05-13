@@ -4,34 +4,76 @@ using Heuristics.TechEval.Core;
 using Heuristics.TechEval.Web.Models;
 using Heuristics.TechEval.Core.Models;
 using Newtonsoft.Json;
+using Heuristics.TechEval.Web.Services;
+using Heuristics.TechEval.Web.Services.Implementations;
+using System.Data;
+using System;
 
 namespace Heuristics.TechEval.Web.Controllers {
 
 	public class MembersController : Controller {
 
-		private readonly DataContext _context;
+		private readonly IMemberService _memberService;
 
-		public MembersController() {
-			_context = new DataContext();
+		public MembersController(IMemberService memberService) {
+			_memberService = memberService;
 		}
 
 		public ActionResult List() {
-			var allMembers = _context.Members.ToList();
+
+			var allMembers = _memberService.GetMembers();
 
 			return View(allMembers);
 		}
 
-		[HttpPost]
-		public ActionResult New(NewMember data) {
-			var newMember = new Member {
-				Name = data.Name,
-				Email = data.Email
-			};
+		[HttpGet]
+		public ActionResult New()
+		{
+			return PartialView("_New");
+		}
 
-			_context.Members.Add(newMember);
-			_context.SaveChanges();
+		[HttpPost]
+		public ActionResult New(MemberModel data) {
+
+			if(!ModelState.IsValid)
+            {
+				return View();
+			}
+
+			// verify email is unique
+			if(MemberExists(data.Email))
+            {
+				ModelState.AddModelError("ExisitingMemberError", "A member with that email already exists.");
+				return View();
+            }
+
+			var newMember = _memberService.AddMember(data);
 
 			return Json(JsonConvert.SerializeObject(newMember));
+		}
+
+		[HttpGet]
+		public ActionResult Edit(int Id)
+		{
+			// TODO: Add a check Id is not null
+
+			var memberToEdit = _memberService.GetMember(Id);
+
+			return PartialView("_Edit", memberToEdit);
+		}
+
+		[HttpPost]
+		public ActionResult Edit(MemberModel data)
+		{
+			var updatedMember = _memberService.UpdateMember(data);
+
+			return Json(JsonConvert.SerializeObject(updatedMember));
+		}
+
+		private bool MemberExists(string email)
+        {
+			var member = _memberService.GetMemberByEmail(email);
+			return member != null;
 		}
 	}
 }
