@@ -94,8 +94,8 @@ namespace Heuristics.TechEval.Tests.Controllers
 		[TestCase(0, null, null)]
 		public void New_Failure(int id, string name, string email)
 		{
-			membersController.ViewData.ModelState.Clear();
 			// Arrange
+			membersController.ViewData.ModelState.Clear();
 			memberServiceMock.Setup(x => x.AddMember(It.IsAny<MemberModel>())).Returns(new Member { Id = id, Name = name, Email = email });
 
 			var member = new MemberModel { Name = name, Email = email };
@@ -105,6 +105,25 @@ namespace Heuristics.TechEval.Tests.Controllers
 
 			// Assert
 			Assert.IsNotNull(result);
+			Assert.IsTrue(membersController.ModelState.Count > 0);
+		}
+
+		[Test]
+		[TestCase(1, "Test User", "testuser@gmail.com")]
+		public void New_Failure_EmailAlreadyExists(int id, string name, string email)
+		{
+			// Arrange
+			memberServiceMock.Setup(x => x.AddMember(It.IsAny<MemberModel>())).Returns(new Member { Id = id, Name = name, Email = email });
+			memberServiceMock.Setup(x => x.GetMemberByEmail(It.IsAny<string>())).Returns(new Member { Id = id, Name = name, Email = email });
+
+			var member = new MemberModel { Name = name, Email = email };
+
+			// Act
+			ViewResult result = membersController.New(member) as ViewResult;
+
+			// Assert
+			Assert.IsNotNull(result);
+			Assert.That(result, Is.InstanceOf<ViewResult>());
 			Assert.IsTrue(membersController.ModelState.Count > 0);
 		}
 

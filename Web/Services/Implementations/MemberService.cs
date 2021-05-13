@@ -21,6 +21,7 @@ namespace Heuristics.TechEval.Web.Services.Implementations
         public List<Member> GetMembers() => _context.Members.ToList();
 
         public Member GetMember(int memberId) => _context.Members.FirstOrDefault(m => m.Id == memberId);
+        public Member GetMemberByEmail(string email) => _context.Members.FirstOrDefault(m => m.Email == email);
 
         public Member AddMember(MemberModel member)
         {

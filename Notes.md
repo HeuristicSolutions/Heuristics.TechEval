@@ -29,6 +29,8 @@
 
 ## Task 3 - Prevent duplicate email addresses
 
+- I'm still having trouble getting model state errors into the partial view
+
 ## Tips
 
 When you want to start with a fresh DB again, just run these two commands in the package management console:

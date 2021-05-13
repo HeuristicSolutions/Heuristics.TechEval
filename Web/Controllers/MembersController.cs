@@ -40,6 +40,13 @@ namespace Heuristics.TechEval.Web.Controllers {
 				return View();
 			}
 
+			// verify email is unique
+			if(MemberExists(data.Email))
+            {
+				ModelState.AddModelError("ExisitingMemberError", "A member with that email already exists.");
+				return View();
+            }
+
 			var newMember = _memberService.AddMember(data);
 
 			return Json(JsonConvert.SerializeObject(newMember));
@@ -61,6 +68,12 @@ namespace Heuristics.TechEval.Web.Controllers {
 			var updatedMember = _memberService.UpdateMember(data);
 
 			return Json(JsonConvert.SerializeObject(updatedMember));
+		}
+
+		private bool MemberExists(string email)
+        {
+			var member = _memberService.GetMemberByEmail(email);
+			return member != null;
 		}
 	}
 }

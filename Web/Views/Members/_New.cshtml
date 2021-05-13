@@ -9,4 +9,5 @@
     <label for="Email">Email Address</label>
     <input type="email" class="form-control" id="Email" name="Email" required />
     @Html.ValidationMessageFor(m => m.Email)
+    @Html.ValidationMessage("ExisitingMemberError")
 </div>

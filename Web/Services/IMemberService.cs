@@ -12,6 +12,7 @@ namespace Heuristics.TechEval.Web.Services
     {
         List<Member> GetMembers();
         Member GetMember(int Id);
+        Member GetMemberByEmail(string email);
         Member AddMember(MemberModel member);
         Member UpdateMember(MemberModel member);
     }
