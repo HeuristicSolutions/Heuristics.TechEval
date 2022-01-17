@@ -27,6 +27,11 @@ namespace Heuristics.TechEval.Web.Controllers {
 				Name = data.Name,
 				Email = data.Email
 			};
+            
+			if (IsDupEmail(newMember))
+            {
+				return Json(new { status = "error", message = "That email alrady exists. Please use a different email." } );
+			}
 
 			_context.Members.Add(newMember);
 			_context.SaveChanges();
@@ -47,6 +52,11 @@ namespace Heuristics.TechEval.Web.Controllers {
 			}
 
 			return Json(JsonConvert.SerializeObject(data));
+		}
+
+		private bool IsDupEmail(Member member)
+		{
+			return _context.Members.Any(m => m.Email == member.Email);
 		}
 	}
 }

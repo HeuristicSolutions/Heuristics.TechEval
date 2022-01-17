@@ -19,15 +19,15 @@
     <tbody>
         @foreach (var member in Model)
         {
-            <tr>
-                <th scope="row">@member.Id</th>
-                <td>@member.Name</td>
-                <td>@member.Email</td>
-                <td>
-                    <button type="button" class="btn btn-secondary pull-right" onclick="openEditModal('@member.Id','@member.Name','@member.Email')">Edit</button>
-                </td>
+        <tr>
+            <th scope="row">@member.Id</th>
+            <td>@member.Name</td>
+            <td>@member.Email</td>
+            <td>
+                <button type="button" class="btn btn-secondary pull-right" onclick="openEditModal('@member.Id','@member.Name','@member.Email')">Edit</button>
+            </td>
 
-            </tr>
+        </tr>
         }
     </tbody>
 </table>
