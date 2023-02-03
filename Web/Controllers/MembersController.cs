@@ -18,9 +18,15 @@ namespace Heuristics.TechEval.Web.Controllers
 		}
 
 		public ActionResult List() {
-			var allMembers = _context.Members.ToList();
+            var allMembers = _context.Members.Select(x => new MemberWithCategory
+            {
+                CategoryName = x.Category.Name,
+                Id = x.Id,
+                Email = x.Email,
+                Name = x.Name
+            }).ToList();
 
-			return View(allMembers);
+            return View(allMembers);
 		}
 
 		[HttpPost]
@@ -42,6 +48,7 @@ namespace Heuristics.TechEval.Web.Controllers
                             currentMember.Name = data.Name;
                             currentMember.Email = data.Email;
                             currentMember.LastUpdated = DateTime.UtcNow;
+                            currentMember.CategoryId = 1; // would make it an enum or ddl
                         }
                     }
                     else
@@ -54,7 +61,8 @@ namespace Heuristics.TechEval.Web.Controllers
                         {
                             Name = data.Name,
                             Email = data.Email,
-                            LastUpdated = DateTime.UtcNow
+                            LastUpdated = DateTime.UtcNow,
+                            CategoryId = 1
                         };
                         _context.Members.Add(newMember);
                     }

@@ -1,4 +1,4 @@
-﻿@model List<Heuristics.TechEval.Core.Models.Member>
+﻿@model List<Heuristics.TechEval.Web.Models.MemberWithCategory>
 
 @{
     ViewBag.Title = "Members";
@@ -11,6 +11,7 @@
 	<thead>
         <tr>
             <th scope="col">#</th>
+            <th scope="col">Category</th>
             <th scope="col">Name</th>
             <th scope="col">Email</th>
             <th scope="col">Edit</th>
@@ -20,6 +21,7 @@
 	@foreach (var member in Model) {
         <tr>
             <th scope="row">@member.Id</th>
+            <th scope="row">@member.CategoryName</th>
             <td>@member.Name</td>
             <td>@member.Email</td>
             <td>
