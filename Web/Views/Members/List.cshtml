@@ -73,6 +73,10 @@
                 </tr>`);
                 $("#MemberModal").modal('hide');
                 */
+            },
+            error: function (formData, jqForm, options) {
+                // should use ValidationMessageFor instead of alert
+                alert(options);
             }
         });
     }
