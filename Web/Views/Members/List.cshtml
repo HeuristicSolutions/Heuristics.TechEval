@@ -6,62 +6,74 @@
 
 <h1>Member List</h1>
 
-<button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#NewMemberModal">Add Member</button>
+<button type="button" class="btn btn-primary pull-right" style="margin-bottom: 5px;" data-toggle="modal" onclick="addOrUpdate(0); return false;">Add Member</button>
 <table class="table table-striped table-bordered table-hover">
 	<thead>
-		<tr>
-			<th scope="col">#</th>
-			<th scope="col">Name</th>
-			<th scope="col">Email</th>
-		</tr>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Edit</th>
+        </tr>
 	</thead>
 	<tbody>
 	@foreach (var member in Model) {
-		<tr>
-			<th scope="row">@member.Id</th>
-			<td>@member.Name</td>
-			<td>@member.Email</td>
-		</tr>
+        <tr>
+            <th scope="row">@member.Id</th>
+            <td>@member.Name</td>
+            <td>@member.Email</td>
+            <td>
+                <button type="button" class="btn btn-default" style="margin-bottom: 5px;" data-toggle="modal" onclick="addOrUpdate(@member.Id); return false;">Edit Member</button>
+            </td>
+        </tr>
 	}
 	</tbody>
 </table>
 
-<div class="modal fade" id="NewMemberModal">
-	<div class="modal-dialog" role="document">
-		<form id="NewMemberForm" action="/Members/New" method="post">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">New Member</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="form-group">
-						<label for="Name">Member Name</label>
-						<input type="text" class="form-control" id="Name" name="Name" placeholder="John Smith" />
-					</div>
-					<div class="form-group">
-						<label for="Email">Email Address</label>
-						<input type="email" class="form-control" id="Email" name="Email" placeholder="you@awesome.com" />
-					</div>
-				</div>
-				<div class="modal-footer">
-					<input type="submit" class="btn btn-primary" value="Save" />
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</form>
-	</div>
+<div class="modal fade" id="MemberModal">
+    <div id="myModalContent"></div>
 </div>
 
 <script type="text/javascript">
-	$(document).ready(function () {
-		$("#NewMemberForm").ajaxForm({
-			success: function (formData, jqForm, options) {
-				// sure would be nice if we didn't have to reload the whole page...
-				document.location.reload();
-			}
-		});
-	});
+    const addOrUpdate = (id) => {
+        const options = { "backdrop": "static", keyboard: true };
+        $.ajax({
+            type: "GET",
+            url: "/Members/Details",
+            contentType: "application/json; charset=utf-8",
+            data: { "Id": id },
+            datatype: "json",
+            success: function (data) {
+                $('#myModalContent').html(data);
+                $('#MemberModal').modal(options);
+                $('#MemberModal').modal('show');
+                attachFormHandler();
+            },
+            error: function () {
+                alert("Dynamic content load failed.");
+            }
+        });
+    }
+
+    const attachFormHandler = () => {
+        $("#MemberForm").ajaxForm({
+            success: function (formData, jqForm, options) {
+                // sure would be nice if we didn't have to reload the whole page...
+                document.location.reload();
+                /* First attempt at not using a reload page
+                 * Second attempt would be something like adding the member to the model?
+                const data = JSON.parse(formData);
+                $("#MemberList").append(`<tr>
+                    <th scope="row">${data.Id}</th>
+                    <td>${data.Name}</td>
+                    <td>${data.Email}</td>
+                    <td>
+                        <button type="button" class="btn btn-default" style="margin-bottom: 5px;" data-id="${data.Id}" data-toggle="modal" data-target="#MemberModal">Edit Member</button>
+                    </td>
+                </tr>`);
+                $("#MemberModal").modal('hide');
+                */
+            }
+        });
+    }
 </script>

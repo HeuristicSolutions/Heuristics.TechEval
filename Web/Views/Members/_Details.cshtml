@@ -1,0 +1,32 @@
+﻿@model Heuristics.TechEval.Core.Models.Member
+
+<div class="modal-dialog" role="document">
+    @using (Html.BeginForm("New", "Members", FormMethod.Post, new { id = "MemberForm" }))
+    {
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @Html.HiddenFor(member => member.Id)
+                <div class="form-group">
+                    @Html.LabelFor(member => member.Name, "Member Name")
+                    @Html.TextBoxFor(member => member.Name, new { @class = "form-control", placeholder = "John Smith" })
+                    @Html.ValidationMessageFor(member => member.Name)
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(member => member.Email, "Email Address")
+                    @Html.TextBoxFor(member => member.Email, new { @class = "form-control", placeholder = "you@awesome.com" })
+                    @Html.ValidationMessageFor(member => member.Email)
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="submit" class="btn btn-primary" value="Save" />
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    }
+</div>
