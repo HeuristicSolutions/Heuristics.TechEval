@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Heuristics.TechEval.Web.Models {
-
+namespace Heuristics.TechEval.Web.Models
+{
 	/// <summary>
 	/// DTO representing the creation of a new Member
 	/// </summary>
 	public class NewMember {
-		public string Name { get; set; }
-		public string Email { get; set; }
+        public int Id { get; set; }
+		[Required]
+		[RegularExpression("^[a-zA-Z0-9\\s]*$", ErrorMessage = "Only alphanumeric characters allowed")]
+        public string Name { get; set; }
+        [Required]
+		[EmailAddress]
+        public string Email { get; set; }
 	}
 }

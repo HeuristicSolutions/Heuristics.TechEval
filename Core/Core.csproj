@@ -10,10 +10,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Heuristics.TechEval.Core</RootNamespace>
     <AssemblyName>Heuristics.TechEval.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,6 +55,10 @@
     <Compile Include="Migrations\202301282025065_AddedTimestamp.designer.cs">
       <DependentUpon>202301282025065_AddedTimestamp.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202302031407087_FkMemberToCategory.cs" />
+    <Compile Include="Migrations\202302031407087_FkMemberToCategory.designer.cs">
+      <DependentUpon>202302031407087_FkMemberToCategory.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Category.cs" />
     <Compile Include="DataContext.cs" />
     <Compile Include="Models\Member.cs" />
@@ -74,6 +79,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202301282025065_AddedTimestamp.resx">
       <DependentUpon>202301282025065_AddedTimestamp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202302031407087_FkMemberToCategory.resx">
+      <DependentUpon>202302031407087_FkMemberToCategory.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
