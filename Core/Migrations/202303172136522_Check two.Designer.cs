@@ -7,13 +7,13 @@ namespace Heuristics.TechEval.Core.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class AddedTimestamp : IMigrationMetadata
+    public sealed partial class Checktwo : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedTimestamp));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Checktwo));
         
         string IMigrationMetadata.Id
         {
-            get { return "202301282025065_AddedTimestamp"; }
+            get { return "202303172136522_Check two"; }
         }
         
         string IMigrationMetadata.Source

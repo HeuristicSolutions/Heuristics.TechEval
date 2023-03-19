@@ -51,9 +51,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\202301282025065_AddedTimestamp.cs" />
-    <Compile Include="Migrations\202301282025065_AddedTimestamp.designer.cs">
-      <DependentUpon>202301282025065_AddedTimestamp.cs</DependentUpon>
+    <Compile Include="Migrations\202303171904183_Modified Date.cs" />
+    <Compile Include="Migrations\202303171904183_Modified Date.designer.cs">
+      <DependentUpon>202303171904183_Modified Date.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202303172020266_Check.cs" />
+    <Compile Include="Migrations\202303172020266_Check.designer.cs">
+      <DependentUpon>202303172020266_Check.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202303172136522_Check two.cs" />
+    <Compile Include="Migrations\202303172136522_Check two.designer.cs">
+      <DependentUpon>202303172136522_Check two.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202303182223575_Added category FK.cs" />
+    <Compile Include="Migrations\202303182223575_Added category FK.designer.cs">
+      <DependentUpon>202303182223575_Added category FK.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Category.cs" />
     <Compile Include="DataContext.cs" />
@@ -73,8 +85,17 @@
     <EmbeddedResource Include="Migrations\201711142244515_Initial.resx">
       <DependentUpon>201711142244515_Initial.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202301282025065_AddedTimestamp.resx">
-      <DependentUpon>202301282025065_AddedTimestamp.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202303171904183_Modified Date.resx">
+      <DependentUpon>202303171904183_Modified Date.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202303172020266_Check.resx">
+      <DependentUpon>202303172020266_Check.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202303172136522_Check two.resx">
+      <DependentUpon>202303172136522_Check two.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202303182223575_Added category FK.resx">
+      <DependentUpon>202303182223575_Added category FK.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
