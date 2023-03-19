@@ -3,65 +3,266 @@
 @{
     ViewBag.Title = "Members";
 }
+<div class="row">
+    <div class="col-md-10">
+        <h1>Member List</h1>
+    </div>
+    <div class="col-md-2">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#NewMemberModal" onclick="resetModal()">Add Member</button>
+    </div>
+</div>
 
-<h1>Member List</h1>
-
-<button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#NewMemberModal">Add Member</button>
-<table class="table table-striped table-bordered table-hover">
-	<thead>
-		<tr>
-			<th scope="col">#</th>
-			<th scope="col">Name</th>
-			<th scope="col">Email</th>
-		</tr>
-	</thead>
-	<tbody>
-	@foreach (var member in Model) {
-		<tr>
-			<th scope="row">@member.Id</th>
-			<td>@member.Name</td>
-			<td>@member.Email</td>
-		</tr>
-	}
-	</tbody>
-</table>
+<div class="row">
+    <table class="table table-striped table-bordered table-hover" id="list-view">
+        <thead>
+            <tr>
+                <th></th>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Category</th>
+            </tr>
+        </thead>
+        <tbody id="table-data">
+            @foreach (var member in Model)
+            {
+                <tr>
+                    <td><button type="button" class="btn btn-secondary glyphicon glyphicon-edit" id="Edit+@member.Id" onclick="EditMember()"></button></td>
+                    <th scope="row">@member.Id</th>
+                    <td>@member.Name</td>
+                    <td>@member.Email</td>
+                    <td>@member.Category.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 <div class="modal fade" id="NewMemberModal">
-	<div class="modal-dialog" role="document">
-		<form id="NewMemberForm" action="/Members/New" method="post">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">New Member</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="form-group">
-						<label for="Name">Member Name</label>
-						<input type="text" class="form-control" id="Name" name="Name" placeholder="John Smith" />
-					</div>
-					<div class="form-group">
-						<label for="Email">Email Address</label>
-						<input type="email" class="form-control" id="Email" name="Email" placeholder="you@awesome.com" />
-					</div>
-				</div>
-				<div class="modal-footer">
-					<input type="submit" class="btn btn-primary" value="Save" />
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</form>
-	</div>
+    <div class="modal-dialog" role="document">
+        <form id="NewMemberForm" action="/Members/New" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Member</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="hidden" class="form-control" id="Id" value="">
+                        <label for="Name">Member Name</label>
+                        <input type="text" class="form-control" id="Name" name="Name" placeholder="John Smith" data-val="true" data-val-required="true" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Email">Email Address</label>
+                        <input type="hidden" id="OriginalEmail" value="1">
+                        <input id="btnCheck" type="button" class="btn btn-secondary float-left" value="Check Availability" onclick="CheckAvailability()" />
+                        <input type="email" class="form-control" id="Email" name="Email" placeholder="you@awesome.com" data-val="true" data-val-required="true" onkeydown="ClearMessage()" />
+                        <span id="availability"></span>
+                    </div>
+                    <div class="form-group">
+                        @Html.DropDownList("CategoryId", ViewBag.MyCategories as SelectList, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" id="SaveBtn" class="btn btn-primary" value="Save" />
+                    <button class="btn btn-primary" id="EditBtn" onclick="SubmitEdit()">Edit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script type="text/javascript">
-	$(document).ready(function () {
-		$("#NewMemberForm").ajaxForm({
-			success: function (formData, jqForm, options) {
-				// sure would be nice if we didn't have to reload the whole page...
-				document.location.reload();
-			}
-		});
-	});
+    // New member and form validation
+    var originalState;
+    $(document).ready(function () {
+        originalState = $("#NewMemberModal").clone();
+        $('#EditBtn').hide();
+        $("#NewMemberForm").validate({
+            rules: {
+                Name: {
+                    required: true,
+                    maxlength: 30,
+                    minlength: 3
+                },
+                Email: {
+                    required: true,
+                    maxlength: 50,
+                    minlength: 3
+                },
+            },
+            messages: {
+                Name: {
+                    required: "A Name is required",
+                    maxlength: "Must be less than 30 characters",
+                    minlength: "Must be at least 3 characters"
+                },
+                Email: {
+                    required: "An Email is required",
+                    maxlength: "Must be less than 50 characters",
+                    minlength: "Must be at least 3 characters"
+                },
+            }
+        });
+        $('#NewMemberForm').ajaxForm({
+            beforeSubmit: function () {
+                if (document.getElementById("availability").innerText === "Email is available") {
+                }
+                else {
+                    var message = $("#availability");
+                    message.css("color", "red");
+                    message.html("Check Email availability first");
+                    console.log(document.getElementById("availability").innerText);
+                    return false;
+                }
+            },
+            success: function () {
+                $("#NewMemberModal").modal('hide');
+                document.location.reload();
+            }
+        });
+        $('#list-view').DataTable({
+            columnDefs: [{
+                orderable: false,
+                width: "5%",
+                targets: 0
+            }],
+            order: [[1, 'asc']],
+            responsive: true,
+        });
+    });
+    function resetModal() {
+        $("#NewMemberModal").replaceWith(originalState.clone());
+    };
+</script>
+<script type="text/javascript">
+    // Selection code
+    $('#table-data').on('click', 'tr', function () {
+        if ($(this).hasClass('selected')) {
+            $(this).removeClass('selected');
+        }
+        else {
+            $('tr.selected').removeClass('selected');
+            $(this).addClass('selected');
+        }
+
+    });
+</script>
+<script type="text/javascript">
+    // Edit code
+    function EditMember() {
+        $('#NewMemberForm').attr('id', 'EditMemberForm');
+        $('#EditMemberForm').attr('action', '/Members/UpdateMember');
+        $('#EditMemberForm').attr('method', 'PUT');
+        $('.modal-title').html("Edit Member");
+        setTimeout(
+            function () {
+                var data = $('#list-view').DataTable().row('.selected').data();
+                $('#Name').val(data[2]);
+                $('#Email').val(data[3]);
+                $('#Id').val(data[1]);
+                $('#OriginalEmail').val(data[3]);
+                $('#NewMemberModal').modal('show');
+                $('#SaveBtn').hide();
+                $('#EditBtn').show();
+
+                var message = $("#availability");
+                message.css("color", "green");
+                message.html("Email is available");
+                $('#btnCheck').hide();
+            }, 250
+        );
+    };
+    function SubmitEdit() {
+        console.log("Idk");
+        $("#EditMemberForm").validate({
+            rules: {
+                Name: {
+                    required: true,
+                    maxlength: 30,
+                    minlength: 3
+                },
+                Email: {
+                    required: true,
+                    maxlength: 50,
+                    minlength: 3
+                },
+            },
+            messages: {
+                Name: {
+                    required: "A Name is required",
+                    maxlength: "Must be less than 30 characters",
+                    minlength: "Must be at least 3 characters"
+                },
+                Email: {
+                    required: "An Email is required",
+                    maxlength: "Must be less than 50 characters",
+                    minlength: "Must be at least 3 characters"
+                },
+            }
+        });
+        $.ajax({
+            beforeSubmit: function () {
+                if (document.getElementById("availability").innerText === "Email is available") {
+                }
+                else {
+                    var message = $("#availability");
+                    message.css("color", "red");
+                    message.html("Check Email availability first");
+                    console.log(document.getElementById("availability").innerText);
+                    return false;
+                }
+            },
+            url: "/Members/UpdateMember",
+            type: 'PUT',
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                $("#EditMemberForm").modal('hide');
+                document.location.reload();
+            }
+        });
+    };
+</script>
+<script type="text/javascript">
+    // Email availability
+    function CheckAvailability() {
+
+        var email = $("#Email").val();
+        var message = $("#availability");
+        console.log($("#originalEmail").val())
+        if (email === $("#originalEmail").val()) {
+            // Email is the same
+            message.css("color", "green");
+            message.html("Email is available");
+        }
+        else {
+            $.ajax({
+                type: "POST",
+                url: "/Members/CheckEmail",
+                data: '{email: "' + email + '" }',
+                contentType: "application/json; charset=utf-8",
+                datatype: "json",
+                success: function (result) {
+                    if (result) {
+                        //Email not available.
+                        message.css("color", "red");
+                        message.html("Email is not available");
+                    }
+                    else {
+                        //Email available.
+                        message.css("color", "green");
+                        message.html("Email is available");
+                    }
+                }
+            });
+        }
+    };
+
+    function ClearMessage() {
+        $("#availability").html("");
+        $('#btnCheck').show();
+    };
 </script>
