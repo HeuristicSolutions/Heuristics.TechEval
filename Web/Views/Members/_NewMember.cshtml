@@ -1,0 +1,95 @@
+﻿@model Heuristics.TechEval.Web.Models.NewMember
+
+<form id="NewMemberForm" action="/Members/New" method="post">
+    @Html.AntiForgeryToken()
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">New Member</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="Name">Member Name</label>
+                <input onblur="validate('Name')" type="text" class="form-control" id="Name" name="Name" placeholder="John Smith" />
+                @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger", @id = "newMemberFormNameError" })
+            </div>
+            <div class="form-group">
+                <label for="Email">Email Address</label>
+                <input onblur="validate('Email')" type="email" class="form-control" id="Email" name="Email" placeholder="you@awesome.com" />
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger", @id = "newMemberFormEmailError" })
+            </div>
+        </div>
+        <div class="modal-footer">
+            <input type="submit" class="btn btn-primary" value="Save" />
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</form>
+
+<script type="text/javascript">
+    function validate(field) {
+        if (field === 'Name') {
+            if ($('#Name').val() === '') {
+                $("#newMemberFormNameError").text("Name is a required field.")
+            } else {
+                $("#newMemberFormNameError").text("")
+            }
+        }
+
+        if (field === 'Email') {
+            if ($('#Email').val() === '') {
+                $("#newMemberFormEmailError").text("Email is a required field.")
+            } else {
+                $("#newMemberFormEmailError").text("")
+            }
+        }
+    }
+    $(document).ready(function () {
+
+        $("#NewMemberForm").ajaxForm({
+            success: function (formData, jqForm, options) {
+                console.log('in res success: formData', formData, jqForm, options)
+                // sure would be nice if we didn't have to reload the whole page...
+                //document.location.reload();
+            },
+            error: function (error) {
+                var response = JSON.parse(error.responseText);
+                for (var i = 0; i < response.length; i++) {
+                    var error = response[i];
+                    var fieldKey = error.Key;
+                    var message = error.Message;
+
+                    if (fieldKey === "Name") {
+                        $("#newMemberFormNameError").text(message)
+                    }
+
+                    if (fieldKey === "Email") {
+                        $("#newMemberFormEmailError").text(message)
+                    }
+                }
+            },
+            beforeSubmit: function (arr, $form, options) {
+                let hasError = false;
+                for (var item of arr) {
+                    console.log(item.name)
+                    if (item.name === "Name") {
+                        if (item.value === '') {
+                            $("#newMemberFormNameError").text("Name is a required field.")
+                            hasError = true;
+                        }
+                    }
+
+                    if (item.name === "Email") {
+                        if (item.value === '') {
+                            $("#newMemberFormEmailError").text("Email is a required field.")
+                            hasError = true;
+                        }
+                    }
+                }
+                if (hasError) return false;
+            }
+        });
+    });
+</script>
