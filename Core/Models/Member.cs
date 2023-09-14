@@ -8,6 +8,10 @@ namespace Heuristics.TechEval.Core.Models {
 		public string Name { get; set; }
 		public string Email { get; set; }
 		public DateTime LastUpdated { get; set; }
+
+        public int CategoryId { get; set; }
+		public Category Category { get; set; }
+		
 	}
 }
 

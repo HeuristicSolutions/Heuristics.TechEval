@@ -1,21 +1,31 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Web.Mvc;
 using Heuristics.TechEval.Core;
+using Heuristics.TechEval.Core.Models;
+using Heuristics.TechEval.Core.Repositories;
+using Heuristics.TechEval.Web.ViewModels;
 
 namespace Heuristics.TechEval.Web.Controllers {
 
 	public class CategoriesController : Controller {
 
-		private readonly DataContext _context;
+        private readonly ICategoryRepository _categoryRepository;
 
-		public CategoriesController() {
-			_context = new DataContext();
-		}
+        public CategoriesController(ICategoryRepository categoryRepository) {
+            _categoryRepository = categoryRepository;
+        }
 
 		public ActionResult List() {
-			var categories = _context.Categories.ToList();
+            var categoriesWithMembers = _categoryRepository.GetCategories().ToList();
 
-			return View(categories);
+            var viewModel = new CategoriesViewModel()
+			{
+				Categories = categoriesWithMembers
+            };
+			return View(viewModel);
 		}
 	}
 }

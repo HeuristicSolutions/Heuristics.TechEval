@@ -7,72 +7,106 @@ using Newtonsoft.Json;
 using System;
 using System.Data.Entity;
 using Heuristics.TechEval.Web.ExtensionMethods;
+using Heuristics.TechEval.Web.ViewModels;
+using Heuristics.TechEval.Core.Repositories;
+using Heuristics.TechEval.Web.Services;
 
 namespace Heuristics.TechEval.Web.Controllers {
 
 	public class MembersController : Controller {
 
-		private readonly DataContext _context;
+        private readonly IMemberRepository _memberRepository;
+        private readonly ICategoryRepository _categoryRepository;
+        private readonly IResponseService _responseService;
 
-		public MembersController() {
-			_context = new DataContext();
+		public MembersController(IMemberRepository memberRepository, ICategoryRepository categoryRepository, IResponseService responseService) {
+            _memberRepository = memberRepository;
+            _categoryRepository = categoryRepository;
+            _responseService = responseService;
 		}
 
 		public ActionResult List() {
-			var allMembers = _context.Members.ToList();
+            var allMembers = _memberRepository.GetMembers().ToList();
+            var allCategories = _categoryRepository.GetCategories().ToList();
 
-
-			return View(allMembers);
+			var viewModel = new MembersViewModel()
+			{
+				Members = allMembers,
+				Categories = allCategories,
+			};
+            return View(viewModel);
 		}
 
 		[HttpPost]
 		public ActionResult New(NewMember model) {
             if (!ModelState.IsValid)
 			{
-				Response.StatusCode = 400;
+                _responseService.SetStatusCode(Response, 400);
+                var modelErrors = ModelState.AllErrors();
+                return Json(modelErrors);
+            }
+			
+            var isExistingEmail = _memberRepository.IsExistingEmail(model.Email);
+
+			if (isExistingEmail == true)
+			{
+                _responseService.SetStatusCode(Response, 400);
+                ModelState.AddModelError("Email", "This email is already in the system.");
                 var modelErrors = ModelState.AllErrors();
                 return Json(modelErrors);
             }
 
-			var existingEmail = _context.Members.Where(m => m.Email == model.Email).FirstOrDefault();
-
-			//if (existingEmail != null)
-			//{
-
-			//	return 
-			//}
-
-            var newMember = new Member
+			var newMember = new Member
             {
                 Name = model.Name,
                 Email = model.Email,
+				CategoryId = model.CategoryId,
                 LastUpdated = DateTime.Now
             };
 
-            _context.Members.Add(newMember);
-            _context.SaveChanges();
+            _memberRepository.AddMember(newMember);
+
+            var category = _categoryRepository.GetCategory(model.CategoryId);
+            newMember.Category = category;
 
             return Json(JsonConvert.SerializeObject(newMember));
         }
 
-   //     [HttpPost]
-   //     public ActionResult Edit(EditMember data)
-   //     {
-   //         var newMember = new Member
-   //         {
-   //             Name = data.Name,
-   //             Email = data.Email,
-   //             LastUpdated = DateTime.Now
-   //         };
+        [HttpPost]
+        public ActionResult Edit(EditMember model)
+        {
+            if (!ModelState.IsValid)
+            {
+                _responseService.SetStatusCode(Response, 400);
+                var modelErrors = ModelState.AllErrors();
+                return Json(modelErrors);
+            }
 
-			//var member = _context.Members.Where(m => m.Id == data.Id).FirstOrDefault();
-			//member.Email = data.Email;
-			//member.Name = data.Name;
-			//member.LastUpdated = DateTime.Now;
+            var member = _memberRepository.GetMember(model.Id);
 
-   //         _context.SaveChanges();
+            if (member.Email != model.Email)
+            {
+                var isExistingEmail = _memberRepository.IsExistingEmail(model.Email);
 
-   //         return Json(JsonConvert.SerializeObject(member));
-   //     }
+                if (isExistingEmail == true)
+                {
+                    _responseService.SetStatusCode(Response, 400);
+                    ModelState.AddModelError("Email", "This email is already in the system.");
+                    var modelErrors = ModelState.AllErrors();
+                    return Json(modelErrors);
+                }
+                member.Email = model.Email;
+            }
+
+            member.Name = model.Name;
+            member.CategoryId = model.CategoryId;
+            member.LastUpdated = DateTime.Now;
+            _memberRepository.UpdateMember(member);
+
+            var category = _categoryRepository.GetCategory(model.CategoryId);
+            member.Category = category;
+
+            return Json(JsonConvert.SerializeObject(member));
+        }
     }
 }

@@ -1,0 +1,137 @@
+﻿@model Heuristics.TechEval.Web.ViewModels.MembersViewModel
+
+<form id="EditMemberForm" action="/Members/Edit" method="post">
+    @Html.AntiForgeryToken()
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Edit Member</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="editMemberFormId" name="Id" />
+            <div class="form-group">
+                <label for="Name">Member Name</label>
+                <input onblur="editMemberValidate('Name')" type="text" class="form-control" id="editMemberFormName" name="Name" placeholder="John Smith" />
+                @Html.ValidationMessageFor(m => m.EditMember.Name, "", new { @class = "text-danger", @id = "editMemberFormNameError" })
+            </div>
+            <div class="form-group">
+                <label for="Email">Email Address</label>
+                <input onblur="editMemberValidate('Email')" type="email" class="form-control" id="editMemberFormEmail" name="Email" placeholder="you@awesome.com" />
+                @Html.ValidationMessageFor(m => m.EditMember.Email, "", new { @class = "text-danger", @id = "editMemberFormEmailError" })
+            </div>
+            <div class="form-group">
+                <label for="Category">Category</label>
+                <select onblur="editMemberValidate('CategoryId')" class="form-select form-control" aria-label="Default select example" name="CategoryId" id="editMemberFormCategoryId">
+                    <option value="" selected>Choose Category</option>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <option value=@category.Id>@category.Name</option>
+                    }
+                </select>
+                @Html.ValidationMessageFor(m => m.EditMember.Email, "", new { @class = "text-danger", @id = "editMemberFormCategoryIdError" })
+            </div>
+        </div>
+        <div class="modal-footer">
+            <input type="submit" class="btn btn-primary" value="Save" />
+            <button onclick="editMemberModalOnCloseHandler()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</form>
+
+<script type="text/javascript">
+    function editMemberModalOnCloseHandler() {
+        $("#editMemberFormNameError").text("")
+        $("#editMemberFormEmailError").text("")
+        $('#editMemberFormCategoryIdError').text("")
+    }
+
+    function editMemberValidate(field) {
+        if (field === 'Name') {
+            if ($('#editMemberFormName').val() === '') {
+                $("#editMemberFormNameError").text("Name is a required field.")
+            } else {
+                $("#editMemberFormNameError").text("")
+            }
+        }
+
+        if (field === 'Email') {
+            if ($('#editMemberFormEmail').val() === '') {
+                $("#editMemberFormEmailError").text("Email is a required field.")
+            } else {
+                $("#editMemberFormEmailError").text("")
+            }
+        }
+
+        if (field === 'CategoryId') {
+            if ($('#editMemberFormCategoryId').val() === '') {
+                $('#editMemberFormCategoryIdError').text("Category is a required field.")
+            } else {
+                $('#editMemberFormCategoryIdError').text("")
+            }
+        }
+    }
+    $(document).ready(function () {
+        $("#EditMemberForm").ajaxForm({
+            success: function (formData, jqForm, options) {
+                var res = JSON.parse(formData);
+
+                $('#name-' + res.Id).text(res.Name)
+                $('#email-' + res.Id).text(res.Email)
+                $('#categoryName-' + res.Id).text(res.Category.Name)
+                $('#editBtn-' + res.Id).data('categoryid', res.CategoryId)
+                $('#editBtn-' + res.Id).data('name', res.Name)
+                $('#editBtn-' + res.Id).data('email', res.Email)
+
+                $('#EditMemberModal').modal('hide');
+            },
+            error: function (error) {
+                var response = JSON.parse(error.responseText);
+                for (var i = 0; i < response.length; i++) {
+                    var error = response[i];
+                    var fieldKey = error.Key;
+                    var message = error.Message;
+
+                    if (fieldKey === "Name") {
+                        $("#editMemberFormNameError").text(message)
+                    }
+
+                    if (fieldKey === "Email") {
+                        $("#editMemberFormEmailError").text(message)
+                    }
+
+                    if (fieldKey === "CategoryId") {
+                        $("#editMemberFormCategoryIdError").text(message)
+                    }
+                }
+            },
+            beforeSubmit: function (arr, $form, options) {
+                let hasError = false;
+                for (var item of arr) {
+                    if (item.name === "Name") {
+                        if (item.value === '') {
+                            $("#editMemberFormNameError").text("Name is a required field.")
+                            hasError = true;
+                        }
+                    }
+
+                    if (item.name === "Email") {
+                        if (item.value === '') {
+                            $("#editMemberFormEmailError").text("Email is a required field.")
+                            hasError = true;
+                        }
+                    }
+
+                    if (item.name === "CategoryId") {
+                        if (item.value === '') {
+                            $("#editMemberFormCategoryIdError").text("Category is a required field.")
+                            hasError = true;
+                        }
+                    }
+                }
+                if (hasError) return false;
+            }
+        });
+    });
+</script>

@@ -1,4 +1,4 @@
-﻿@model List<Heuristics.TechEval.Core.Models.Member>
+﻿@model Heuristics.TechEval.Web.ViewModels.MembersViewModel
 @using Heuristics.TechEval.Web.Models
 @{
     ViewBag.Title = "Members";
@@ -13,17 +13,19 @@
             <th scope="col">#</th>
             <th scope="col">Name</th>
             <th scope="col">Email</th>
+            <th scope="col">Category</th>
             <th scope="col">Actions</th>
         </tr>
     </thead>
-    <tbody>
-        @foreach (var member in Model)
+    <tbody id="tableBody">
+        @foreach (var member in Model.Members)
         {
             <tr>
-                <th style="vertical-align: revert" scope="row">@member.Id</th>
-                <td style="vertical-align: revert">@member.Name</td>
-                <td style="vertical-align: revert">@member.Email</td>
-                <td><button type="button" class="btn btn-link" id="editBtn-@member.Id" data-id="@member.Id" data-name="@member.Name" data-email="@member.Email" data-toggle="modal" data-target="#EditMemberModal">Edit</button></td>
+                <th id="@member.Id" style="vertical-align: revert" scope="row">@member.Id</th>
+                <td id="name-@member.Id" style="vertical-align: revert">@member.Name</td>
+                <td id="email-@member.Id" style="vertical-align: revert">@member.Email</td>
+                <td id="categoryName-@member.Id" style="vertical-align: revert">@member.Category.Name</td>
+                <td><button type="button" class="btn btn-link" id="editBtn-@member.Id" data-categoryid="@member.CategoryId" data-id="@member.Id" data-name="@member.Name" data-email="@member.Email" data-toggle="modal" data-target="#EditMemberModal">Edit</button></td>
             </tr>
         }
     </tbody>
@@ -31,80 +33,31 @@
 
 <div class="modal fade" id="NewMemberModal">
     <div class="modal-dialog" role="document">
-            @Html.Partial("_NewMember", new NewMember())
+            @Html.Partial("_NewMember", Model)
         </div>
 </div>
 
 <div class="modal fade" id="EditMemberModal">
     <div class="modal-dialog" role="document">
-        <form id="EditMemberForm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Member</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="editFormId" name="Id" />
-                    <div class="form-group">
-                        <label for="Name">Member Name</label>
-                        <input type="text" class="form-control" id="editFormName" name="Name" placeholder="John Smith" />
-                    </div>
-                    <div class="form-group">
-                        <label for="Email">Email Address</label>
-                        <input type="email" class="form-control" id="editFormEmail" name="Email" placeholder="you@awesome.com" />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <input type="submit" class="btn btn-primary" value="Save" />
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </form>
+        @Html.Partial("_EditMember", Model)        
     </div>
 </div>
 
 <script type="text/javascript">
-
     $('#EditMemberModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget) // Button that triggered the modal
         var name = button.data('name') // Extract info from data-* attributes
         var email = button.data('email')
         var id = button.data('id')
+        var categoryId = button.data('categoryid')
+
         // Update the modal's content.
         var modal = $(this)
-        modal.find('#editFormName').val(name)
-        modal.find('#editFormEmail').val(email)
-        modal.find('#editFormId').val(id)
+        modal.find('#editMemberFormName').val(name)
+        modal.find('#editMemberFormEmail').val(email)
+        modal.find('#editMemberFormId').val(id)
+        modal.find('#editMemberFormCategoryId').val(categoryId)
     })
 
-    $(document).ready(function () {
-
-        //$("#NewMemberForm").ajaxForm({
-        //    success: function (formData, jqForm, options) {
-        //        console.log('in res success: formData', formData, jqForm, options)
-        //        // sure would be nice if we didn't have to reload the whole page...
-        //        //document.location.reload();
-        //    },
-        //    error: function (error) {
-        //        console.log('in error func')
-        //        var response = JSON.parse(error.responseText);
-        //        for (var i = 0; i < response.length; i++) {
-        //            var error = response[i];
-        //            var fieldKey = error.Key;
-        //            var message = error.Message;
-        //            // apply custom logic with field keys and messages
-        //            console.log(fieldKey + ': ' + message);
-        //        }
-        //    }
-        //});
-
-        $("#EditMemberForm").ajaxForm({
-            success: function (formData, jqForm, options) {
-                // sure would be nice if we didn't have to reload the whole page...
-                document.location.reload();
-            }
-        });
-    });
+    
 </script>
