@@ -33,3 +33,7 @@ WHERE
       ON ma.member_id = mtt.member_id 
       AND ma.modified_on = mtt.modified_on
   )
+
+-- create index
+CREATE UNIQUE INDEX IX_MEMBER_ADDRESS_member_id_label
+ON member_address (member_id, label);
