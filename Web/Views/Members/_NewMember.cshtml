@@ -78,20 +78,18 @@
         $("#NewMemberForm").ajaxForm({
             success: function (formData, jqForm, options) {
                 var res = JSON.parse(formData);
-                var newRow = $(`
-                <tr>
-                    <th id=${res.Id} style="vertical-align: revert" scope="row">${res.Id}</th>
-                    <td id="name-${res.Id}" style="vertical-align: revert">${res.Name}</td>
-                    <td id="email-${res.Id}" style="vertical-align: revert">${res.Email}</td>
-                    <td id="categoryName-${res.Id}" style="vertical-align: revert">${res.Category.Name}</td>
-                    <td>
-                        <button type="button" class="btn btn-link" id="editBtn-${res.Id}" data-categoryid="${res.CategoryId}" data-id="${res.Id}" data-email="${res.Email}" data-name="${res.Name}" data-toggle="modal" data-target="#EditMemberModal">
-                            Edit
-                        </button>
-                    </td>
-                </tr>
-                `)
-                $('#tableBody').append(newRow)
+                var newEditBtn = `<button type="button" class="btn btn-link" id="editBtn-${res.Id}" data-categoryid="${res.CategoryId}" data-id="${res.Id}" data-email="${res.Email}" data-name="${res.Name}" data-toggle="modal" data-target="#EditMemberModal">
+                  Edit
+                </button>`;
+                var newRowData = {
+                    Id: res.Id,
+                    Name: res.Name,
+                    Email: res.Email,
+                    Category: res.Category.Name,
+                    Actions: newEditBtn
+                };
+                var newRow = $('#memberTable').DataTable().row.add(newRowData).draw().node();
+                $(newRow).addClass('newly-added-row')
 
                 $('#NewMemberModal').modal('hide');
                 $("#newMemberFormName").val("")

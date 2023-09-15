@@ -76,13 +76,18 @@
         $("#EditMemberForm").ajaxForm({
             success: function (formData, jqForm, options) {
                 var res = JSON.parse(formData);
+                var newEditBtn = `<button type="button" class="btn btn-link" id="editBtn-${res.Id}" data-categoryid="${res.CategoryId}" data-id="${res.Id}" data-email="${res.Email}" data-name="${res.Name}" data-toggle="modal" data-target="#EditMemberModal">
+                  Edit
+                </button>`;
+                var rowData = {
+                    Id: res.Id,
+                    Name: res.Name,
+                    Email: res.Email,
+                    Category: res.Category.Name,
+                    Actions: newEditBtn
+                };
 
-                $('#name-' + res.Id).text(res.Name)
-                $('#email-' + res.Id).text(res.Email)
-                $('#categoryName-' + res.Id).text(res.Category.Name)
-                $('#editBtn-' + res.Id).data('categoryid', res.CategoryId)
-                $('#editBtn-' + res.Id).data('name', res.Name)
-                $('#editBtn-' + res.Id).data('email', res.Email)
+                $('#memberTable').DataTable().row(`#${res.Id}`).data(rowData).draw();
 
                 $('#EditMemberModal').modal('hide');
             },
