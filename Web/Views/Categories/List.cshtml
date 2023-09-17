@@ -1,4 +1,4 @@
-﻿@model List<Heuristics.TechEval.Core.Models.Category>
+﻿@model Heuristics.TechEval.Web.ViewModels.CategoriesViewModel
 
 @{
 	ViewBag.Title = "Categories";
@@ -11,13 +11,15 @@
 	<tr>
 		<th scope="col">#</th>
 		<th scope="col">Name</th>
+		<th scope="col">Count</th>
 	</tr>
 	</thead>
 	<tbody>
-	@foreach (var member in Model) {
+	@foreach (var category in Model.Categories) {
 		<tr>
-			<th scope="row">@member.Id</th>
-			<td>@member.Name</td>
+			<th scope="row">@category.Id</th>
+			<td>@category.Name</td>
+			<td>@category.Members.Count</td>
 		</tr>
 	}
 	</tbody>

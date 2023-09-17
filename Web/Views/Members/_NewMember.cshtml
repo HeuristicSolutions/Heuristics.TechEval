@@ -1,0 +1,147 @@
+﻿@model Heuristics.TechEval.Web.ViewModels.MembersViewModel
+
+<form id="NewMemberForm" action="/Members/New" method="post">
+    @Html.AntiForgeryToken()
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">New Member</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="Name">Member Name</label>
+                <input onblur="newMemberValidate('Name')" type="text" class="form-control" id="newMemberFormName" name="Name" placeholder="John Smith" />
+                @Html.ValidationMessageFor(m => m.NewMember.Name, "", new { @class = "text-danger", @id = "newMemberFormNameError" })
+            </div>
+            <div class="form-group">
+                <label for="Email">Email Address</label>
+                <input onblur="newMemberValidate('Email')" type="email" class="form-control" id="newMemberFormEmail" name="Email" placeholder="you@awesome.com" />
+                @Html.ValidationMessageFor(m => m.NewMember.Email, "", new { @class = "text-danger", @id = "newMemberFormEmailError" })
+            </div>
+            <div class="form-group">
+                <label for="Category">Category</label>
+                <select onblur="newMemberValidate('CategoryId')" class="form-select form-control" aria-label="Default select example" name="CategoryId" id="newMemberFormCategoryId">
+                    <option value="" selected>Choose Category</option>
+                    @foreach (var cateogry in Model.Categories)
+            {
+                <option value=@cateogry.Id>@cateogry.Name</option>
+            }
+                </select>
+                @Html.ValidationMessageFor(m => m.NewMember.Email, "", new { @class = "text-danger", @id = "newMemberFormCategoryIdError" })
+            </div>
+        </div>
+        <div class="modal-footer">
+            <input type="submit" class="btn btn-primary" value="Save" />
+            <button onclick="newMemberModalOnCloseHandler()" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</form>
+
+<script type="text/javascript">
+    function newMemberModalOnCloseHandler() {
+        $("#newMemberFormName").val("")
+        $("#newMemberFormEmail").val("")
+        $('#newMemberFormCategoryId').val("")
+        $("#newMemberFormNameError").text("")
+        $("#newMemberFormEmailError").text("")
+        $('#newMemberFormCategoryIdError').text("")
+    }
+
+    function newMemberValidate(field) {
+        if (field === 'Name') {
+            if ($('#newMemberFormName').val() === '') {
+                $("#newMemberFormNameError").text("Name is a required field.")
+            } else {
+                $("#newMemberFormNameError").text("")
+            }
+        }
+
+        if (field === 'Email') {
+            if ($('#newMemberFormEmail').val() === '') {
+                $("#newMemberFormEmailError").text("Email is a required field.")
+            } else {
+                $("#newMemberFormEmailError").text("")
+            }
+        }
+
+        if (field === 'CategoryId') {
+            if ($('#newMemberFormCategoryId').val() === '') {
+                $('#newMemberFormCategoryIdError').text("Category is a required field.")
+            } else {
+                $('#newMemberFormCategoryIdError').text("")
+            }
+        }
+    }
+    $(document).ready(function () {
+        $("#NewMemberForm").ajaxForm({
+            success: function (formData, jqForm, options) {
+                var res = JSON.parse(formData);
+                var newEditBtn = `<button type="button" class="btn btn-link" id="editBtn-${res.Id}" data-categoryid="${res.CategoryId}" data-id="${res.Id}" data-email="${res.Email}" data-name="${res.Name}" data-toggle="modal" data-target="#EditMemberModal">
+                  Edit
+                </button>`;
+                var newRowData = {
+                    Id: res.Id,
+                    Name: res.Name,
+                    Email: res.Email,
+                    Category: res.Category.Name,
+                    Actions: newEditBtn
+                };
+                var newRow = $('#memberTable').DataTable().row.add(newRowData).draw().node();
+                $(newRow).addClass('newly-added-row')
+
+                $('#NewMemberModal').modal('hide');
+                $("#newMemberFormName").val("")
+                $("#newMemberFormEmail").val("")
+                $('#newMemberFormCategoryId').val("")
+            },
+            error: function (error) {
+                var response = JSON.parse(error.responseText);
+                for (var i = 0; i < response.length; i++) {
+                    var error = response[i];
+                    var fieldKey = error.Key;
+                    var message = error.Message;
+
+                    if (fieldKey === "Name") {
+                        $("#newMemberFormNameError").text(message)
+                    }
+
+                    if (fieldKey === "Email") {
+                        $("#newMemberFormEmailError").text(message)
+                    }
+
+                    if (fieldKey === "CategoryId") {
+                        $("#newMemberFormCategoryIdError").text(message)
+                    }
+                }
+            },
+            beforeSubmit: function (arr, $form, options) {
+                let hasError = false;
+                for (var item of arr) {
+                    if (item.name === "Name") {
+                        if (item.value === '') {
+                            $("#newMemberFormNameError").text("Name is a required field.")
+                            hasError = true;
+                        }
+                    }
+
+                    if (item.name === "Email") {
+                        if (item.value === '') {
+                            $("#newMemberFormEmailError").text("Email is a required field.")
+                            hasError = true;
+                        }
+                    }
+
+                    if (item.name === "CategoryId") {
+                        if (item.value === '') {
+                            $("#newMemberFormCategoryIdError").text("Category is a required field.")
+                            hasError = true;
+                        }
+                    }
+                }
+                if (hasError) return false;
+            }
+        });        
+    });
+</script>
