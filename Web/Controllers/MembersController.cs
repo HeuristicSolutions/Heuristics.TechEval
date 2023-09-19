@@ -1,39 +1,64 @@
-﻿using System.Linq;
-using System.Web.Mvc;
-using Heuristics.TechEval.Core;
+﻿using Heuristics.TechEval.Core;
 using Heuristics.TechEval.Web.Models;
-using Heuristics.TechEval.Core.Models;
 using Newtonsoft.Json;
-using System;
+using Newtonsoft.Json.Serialization;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
-namespace Heuristics.TechEval.Web.Controllers {
+namespace Heuristics.TechEval.Web.Controllers
+{
+    public class MembersController : Controller
+    {
+        private readonly DataContext _context;
+        private readonly MemberService _memberService;
 
-	public class MembersController : Controller {
+        //TODO: Injection
+        public MembersController()
+        {
+            _context = new DataContext();
+            _memberService = new MemberService(_context);
+        }
 
-		private readonly DataContext _context;
+        public ActionResult List()
+        {
+            return View(new MembersViewModel() 
+            { 
+                Members = _memberService.FetchMembers().ToList(),
+                Categories = _memberService.FetchCategories().ToList()
+            });
+        }
 
-		public MembersController() {
-			_context = new DataContext();
-		}
+        [HttpPost]
+        public async Task<ActionResult> New(Member data)
+        {
+            return !_memberService.IsMemberDataValid(data, errors: out var errors) ?
+                JsonResultFormatted(errors, HttpStatusCode.InternalServerError)
+                : JsonResultFormatted(await _memberService.SaveMember(data));
+        }
 
-		public ActionResult List() {
-			var allMembers = _context.Members.ToList();
+        [HttpPost]
+        public async Task<ActionResult> Edit(int Id, Member data)
+        {
+            return !_memberService.IsMemberDataValid(data, Id: Id, errors: out var errors) ?
+                JsonResultFormatted(errors, HttpStatusCode.InternalServerError)
+                : JsonResultFormatted(await _memberService.SaveMember(data));
+        }
 
-			return View(allMembers);
-		}
+        private ContentResult JsonResultFormatted(object obj, HttpStatusCode httpStatusCode = HttpStatusCode.OK) 
+        {
+            HttpContext.Response.StatusCode = (int)httpStatusCode;
 
-		[HttpPost]
-		public ActionResult New(NewMember data) {
-			var newMember = new Member {
-				Name = data.Name,
-				Email = data.Email,
-				LastUpdated = DateTime.Now
-			};
+            return Content(JsonConvert.SerializeObject(obj, new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            }), "application/json");
+        }
 
-			_context.Members.Add(newMember);
-			_context.SaveChanges();
 
-			return Json(JsonConvert.SerializeObject(newMember));
-		}
-	}
+
+
+
+    }
 }

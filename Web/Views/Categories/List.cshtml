@@ -1,24 +1,27 @@
-﻿@model List<Heuristics.TechEval.Core.Models.Category>
+﻿@model Heuristics.TechEval.Web.Models.MembersViewModel
 
 @{
-	ViewBag.Title = "Categories";
+    ViewBag.Title = "Categories";
 }
 
 <h1>Categories</h1>
 
 <table class="table table-striped table-bordered table-hover">
-	<thead>
-	<tr>
-		<th scope="col">#</th>
-		<th scope="col">Name</th>
-	</tr>
-	</thead>
-	<tbody>
-	@foreach (var member in Model) {
-		<tr>
-			<th scope="row">@member.Id</th>
-			<td>@member.Name</td>
-		</tr>
-	}
-	</tbody>
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Member Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model.Categories)
+        {
+            <tr>
+                <th scope="row">@category.Id</th>
+                <td>@category.Name</td>
+                <td>@category.MemberCount</td>
+            </tr>
+        }
+    </tbody>
 </table>
