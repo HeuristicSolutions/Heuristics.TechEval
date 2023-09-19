@@ -48,9 +48,12 @@ namespace Heuristics.TechEval.Web.Controllers
 
 			// todo: this is where we could do something like check ModelState.IsValid
 
+			var email = data.Email.ToLowerInvariant();
 			if (data.Id == default)
 			{
 				// new member
+				if (IsEmailTaken(email)) return BadRequest(string.Format("Email '{0}' is already taken", email));
+
 				_context.Members.Add(new Member
 				{
 					Name = data.Name,
@@ -64,8 +67,13 @@ namespace Heuristics.TechEval.Web.Controllers
 				var existing = _context.Members.FirstOrDefault(_ => _.Id == data.Id);
 				if (existing == null) return BadRequest(string.Format("Member id {0} not found", data.Id));
 
+				// if the member email is changing, make sure it's not a duplicate
+				if(existing.Email != email)
+				{
+					if (IsEmailTaken(email)) return BadRequest(string.Format("Email '{0}' is already taken", email));
+				}
+				existing.Email = email;
 				existing.Name = data.Name;
-				existing.Email = data.Email;
 				existing.LastUpdated = DateTime.Now;
 			}
 
@@ -73,6 +81,11 @@ namespace Heuristics.TechEval.Web.Controllers
 
 			var allMembers = _context.Members.ToList();
 			return PartialView("_List", allMembers);
+		}
+
+		private bool IsEmailTaken(string email)
+		{
+			return _context.Members.Any(_ => _.Email == email);
 		}
 
 		private static ActionResult BadRequest(string message)

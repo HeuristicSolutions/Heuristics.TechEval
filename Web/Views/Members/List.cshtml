@@ -34,6 +34,7 @@
 			},
 			error: function (jqXhr, status, err) {
 				alert("Failed to load details: " + err);
+				// todo: if this is an input issue the error could be shown inline
 			}
 		});
 	}
@@ -55,7 +56,8 @@
 				$("#EditMemberModal").modal("hide");
 				alert("Saved successfully!"); // a toast would be better, just tell the user we actually did something
 			},
-			error: function (err) {
+			error: function (jqXhr, status, err) {
+				console.log(err);
 				alert("Failed to save member: " + err);
 			}
 		});
