@@ -1,4 +1,4 @@
-﻿@model List<Heuristics.TechEval.Core.Models.Member>
+﻿@model List<Heuristics.TechEval.Web.Models.EditMember>
 
 <table class="table table-striped table-bordered table-hover">
 	<thead>
@@ -6,6 +6,7 @@
 			<th scope="col">#</th>
 			<th scope="col">Name</th>
 			<th scope="col">Email</th>
+			<th scope="col">Category</th>
 			<th scope="col">&nbsp;</th>
 		</tr>
 	</thead>
@@ -16,6 +17,7 @@
 				<th scope="row">@member.Id</th>
 				<td>@member.Name</td>
 				<td>@member.Email</td>
+				<td>@member.CategoryName</td>
 				<td>
 					<button type="button" class="btn btn-default" data-toggle="modal" onclick="editMember(@member.Id); return false;">Edit Member</button>
 				</td>

@@ -55,6 +55,10 @@
     <Compile Include="Migrations\202301282025065_AddedTimestamp.designer.cs">
       <DependentUpon>202301282025065_AddedTimestamp.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202309151039452_AddedMemberCategory.cs" />
+    <Compile Include="Migrations\202309151039452_AddedMemberCategory.designer.cs">
+      <DependentUpon>202309151039452_AddedMemberCategory.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Category.cs" />
     <Compile Include="DataContext.cs" />
     <Compile Include="Models\Member.cs" />
@@ -75,6 +79,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202301282025065_AddedTimestamp.resx">
       <DependentUpon>202301282025065_AddedTimestamp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202309151039452_AddedMemberCategory.resx">
+      <DependentUpon>202309151039452_AddedMemberCategory.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -13,6 +13,11 @@ namespace Heuristics.TechEval.Core {
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder) {
 			modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+
+			modelBuilder.Entity<Member>()
+				.HasRequired(_ => _.Category)
+				.WithMany(_ => _.Members)
+				.HasForeignKey(_ => _.CategoryId);
 		}
 	}
 }

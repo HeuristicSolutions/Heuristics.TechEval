@@ -1,5 +1,13 @@
 ﻿@model Heuristics.TechEval.Web.Models.EditMember
 
+@{
+	// for some reason ViewBag isn't being shared by the Partial, defaulting for now
+	ViewBag.MemberCategories = new SelectList(new[] {
+		"Software Developer",
+		"Director of Application Development"
+	});
+}
+
 <div class="modal-dialog" role="document">
 	@using (Html.BeginForm("Edit", "Members", FormMethod.Post, new { id = "EditMemberForm" }))
 	{
@@ -30,6 +38,11 @@
 					@Html.TextBoxFor(member => member.Email,
 						new { @class = "form-control", placeholder = "you@awesome.com", @required = "required" })
 					@Html.ValidationMessageFor(member => member.Email, "", new { @class = "text-danger", id = "EmailValidationText" })
+				</div>
+				<div class="form-group">
+					@Html.LabelFor(member => member.CategoryName, "Category")
+					@Html.DropDownListFor(member => member.CategoryName, ViewBag.MemberCategories as SelectList, new { @class = "form-control" })
+					@Html.ValidationMessageFor(member => member.CategoryName, "", new { @class = "text-danger", id = "CategoryNameValidationText" })
 				</div>
 			</div>
 			<div class="modal-footer">

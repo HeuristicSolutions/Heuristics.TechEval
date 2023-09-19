@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel;
 
 namespace Heuristics.TechEval.Core.Models {
 
@@ -8,6 +10,10 @@ namespace Heuristics.TechEval.Core.Models {
 		public string Name { get; set; }
 		public string Email { get; set; }
 		public DateTime LastUpdated { get; set; }
+
+		[ForeignKey("Category"), DefaultValue(1)]
+		public int CategoryId { get; set; }
+		public Category Category { get; set; }
 	}
 }
 

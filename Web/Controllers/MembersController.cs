@@ -6,6 +6,7 @@ using Heuristics.TechEval.Core.Models;
 using Newtonsoft.Json;
 using System;
 using System.Net;
+using System.Collections.Generic;
 
 namespace Heuristics.TechEval.Web.Controllers
 {
@@ -20,9 +21,7 @@ namespace Heuristics.TechEval.Web.Controllers
 
 		public ActionResult List()
 		{
-			var allMembers = _context.Members.ToList();
-
-			return View(allMembers);
+			return View(GetAllMembers());
 		}
 
 		[HttpGet]
@@ -32,6 +31,12 @@ namespace Heuristics.TechEval.Web.Controllers
 
 			var member = _context.Members.FirstOrDefault(_ => _.Id == id);
 			if (member == null) throw new Exception(string.Format("Member id {0} not found", id));
+
+			var categories = _context.Categories.Select(_ => new SelectListItem {
+				Value = _.Name,
+				Text = _.Name
+			}).ToList();
+			ViewBag.MemberCategories = categories;
 
 			return PartialView("_Details", new EditMember
 			{
@@ -48,6 +53,9 @@ namespace Heuristics.TechEval.Web.Controllers
 
 			// todo: this is where we could do something like check ModelState.IsValid
 
+			var category = _context.Categories.FirstOrDefault(_ => _.Name == data.CategoryName);
+			if (category == null) return BadRequest(string.Format("Category '{0}' not found!", data.CategoryName));
+
 			var email = data.Email.ToLowerInvariant();
 			if (data.Id == default)
 			{
@@ -58,6 +66,7 @@ namespace Heuristics.TechEval.Web.Controllers
 				{
 					Name = data.Name,
 					Email = data.Email,
+					CategoryId = category.Id,
 					LastUpdated = DateTime.Now
 				});
 			}
@@ -74,13 +83,31 @@ namespace Heuristics.TechEval.Web.Controllers
 				}
 				existing.Email = email;
 				existing.Name = data.Name;
+				existing.CategoryId = category.Id;
 				existing.LastUpdated = DateTime.Now;
 			}
 
 			_context.SaveChanges();
 
-			var allMembers = _context.Members.ToList();
-			return PartialView("_List", allMembers);
+			return PartialView("_List", GetAllMembers());
+		}
+
+		private int? GetMemberCategoryByName(EditMember member)
+		{
+			var category = _context.Categories.FirstOrDefault(_ => _.Name == member.CategoryName);
+			if (category != null) return category.Id;
+			return null;
+		}
+
+		private List<EditMember> GetAllMembers()
+		{
+			return _context.Members.Select(_ => new EditMember
+			{
+				Id = _.Id,
+				Name = _.Name,
+				Email = _.Email,
+				CategoryName = _.Category.Name,
+			}).ToList();
 		}
 
 		private bool IsEmailTaken(string email)
