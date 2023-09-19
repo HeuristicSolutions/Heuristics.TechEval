@@ -4,9 +4,9 @@
 	<thead>
 		<tr>
 			<th scope="col">#</th>
-			<th scope="col">Name</th>
-			<th scope="col">Email</th>
-			<th scope="col">Category</th>
+			<th scope="col">@Html.ActionLink("Name", "List", new { prevSort = ViewBag.SortOrder, sortBy = "Name" })</th>
+			<th scope="col">@Html.ActionLink("Email", "List", new { prevSort = ViewBag.SortOrder, sortBy = "Email" })</th>
+			<th scope="col">@Html.ActionLink("Category", "List", new { prevSort = ViewBag.SortOrder, sortBy = "Category" })</th>
 			<th scope="col">&nbsp;</th>
 		</tr>
 	</thead>

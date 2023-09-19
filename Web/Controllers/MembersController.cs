@@ -19,9 +19,26 @@ namespace Heuristics.TechEval.Web.Controllers
 			_context = new DataContext();
 		}
 
-		public ActionResult List()
+		[HttpGet]
+		public ActionResult List(string prevSort, string sortBy)
 		{
+			ViewBag.SortOrder = ToggleSort(prevSort, sortBy);
+
 			return View(GetAllMembers());
+		}
+
+		private string ToggleSort(string prevSort, string sortBy)
+		{
+			if (string.IsNullOrEmpty(sortBy)) return "Name";
+			if (sortBy == "Name")
+			{
+				return prevSort == "Name" ? "name_desc" : "Name";
+			}
+
+			if (sortBy == "Email") return prevSort == "Email" ? "email_desc" : "Email";
+			if (sortBy == "Category") return prevSort == "Category" ? "category_desc" : "Category";
+
+			return "Name"; // default
 		}
 
 		[HttpGet]
@@ -101,7 +118,34 @@ namespace Heuristics.TechEval.Web.Controllers
 
 		private List<EditMember> GetAllMembers()
 		{
-			return _context.Members.Select(_ => new EditMember
+			var sortOrder = ViewBag.SortOrder;
+			var allMembers = from m in _context.Members select m;
+			switch (sortOrder)
+			{
+				case "Name":
+					allMembers = allMembers.OrderBy(_ => _.Name);
+					break;
+				case "name_desc":
+					allMembers = allMembers.OrderByDescending(_ => _.Name);
+					break;
+				case "Email":
+					allMembers = allMembers.OrderBy(_ => _.Email);
+					break;
+				case "email_desc":
+					allMembers = allMembers.OrderByDescending(_ => _.Email);
+					break;
+				case "Category":
+					allMembers = allMembers.OrderBy(_ => _.Category.Name);
+					break;
+				case "category_desc":
+					allMembers = allMembers.OrderByDescending(_ => _.Category.Name);
+					break;
+				default:
+					allMembers = allMembers.OrderByDescending(_ => _.Name);
+					break;
+			}
+
+			return allMembers.Select(_ => new EditMember
 			{
 				Id = _.Id,
 				Name = _.Name,
