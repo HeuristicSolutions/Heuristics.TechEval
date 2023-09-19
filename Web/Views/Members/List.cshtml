@@ -38,6 +38,16 @@
 		});
 	}
 
+	const validateEmail = (input) => {
+		var emailRgx = /^\w+([\.-]?\w+)*@@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+		return input.match(emailRgx) ? true : false;
+	}
+
+	const validateName = (input) => {
+		var nameRgx = /^[A-Z][a-zA-Z0-9\s]*$/;
+		return input.match(nameRgx) ? true : false;
+	}
+
 	const attachFormHandler = () => {
 		$("#EditMemberForm").ajaxForm({
 			success: function (data, status, jqXhr) {
@@ -48,6 +58,19 @@
 			error: function (err) {
 				alert("Failed to save member: " + err);
 			}
+		});
+
+		// add validation
+		$("#SaveMemberBtn").click(function () {
+			var nameInput = $("#Name");
+			var isNameValid = validateName(nameInput.val());
+			$("#NameValidationText").text(isNameValid ? "" : "Please enter a valid name.");
+
+			var emailInput = $("#Email");
+			var isEmailValid = validateEmail(emailInput.val());
+			$("#EmailValidationText").text(isEmailValid ? "" : "Please enter a valid email.");
+
+			return isNameValid && isEmailValid;
 		});
 	}
 </script>

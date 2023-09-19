@@ -46,6 +46,8 @@ namespace Heuristics.TechEval.Web.Controllers
 		{
 			if (data == null) BadRequest("No data provided");
 
+			// todo: this is where we could do something like check ModelState.IsValid
+
 			if (data.Id == default)
 			{
 				// new member
@@ -60,7 +62,7 @@ namespace Heuristics.TechEval.Web.Controllers
 			{
 				// updating an existing member
 				var existing = _context.Members.FirstOrDefault(_ => _.Id == data.Id);
-				if(existing == null) return BadRequest(string.Format("Member id {0} not found", data.Id));
+				if (existing == null) return BadRequest(string.Format("Member id {0} not found", data.Id));
 
 				existing.Name = data.Name;
 				existing.Email = data.Email;
