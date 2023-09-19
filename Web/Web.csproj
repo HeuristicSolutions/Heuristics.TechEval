@@ -162,7 +162,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\NewMember.cs" />
+    <Compile Include="Models\EditMember.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -222,6 +222,8 @@
     <Content Include="Views\Categories\List.cshtml" />
     <Content Include="Views\Home\Setup.cshtml" />
     <Content Include="Scripts\jquery.form.min.js.map" />
+    <Content Include="Views\Members\_Details.cshtml" />
+    <Content Include="Views\Members\_List.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

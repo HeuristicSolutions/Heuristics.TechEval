@@ -1,67 +1,53 @@
 ﻿@model List<Heuristics.TechEval.Core.Models.Member>
 
 @{
-    ViewBag.Title = "Members";
+	ViewBag.Title = "Members";
 }
 
-<h1>Member List</h1>
+<h1>
+	Member List
+	<button type="button" class="btn btn-primary pull-right" data-toggle="modal" onclick="editMember(0); return false;">Add Member</button>
+</h1>
 
-<button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#NewMemberModal">Add Member</button>
-<table class="table table-striped table-bordered table-hover">
-	<thead>
-		<tr>
-			<th scope="col">#</th>
-			<th scope="col">Name</th>
-			<th scope="col">Email</th>
-		</tr>
-	</thead>
-	<tbody>
-	@foreach (var member in Model) {
-		<tr>
-			<th scope="row">@member.Id</th>
-			<td>@member.Name</td>
-			<td>@member.Email</td>
-		</tr>
-	}
-	</tbody>
-</table>
+<div id="MembersList">
+	@Html.Partial("_List", Model)
+</div>
 
-<div class="modal fade" id="NewMemberModal">
-	<div class="modal-dialog" role="document">
-		<form id="NewMemberForm" action="/Members/New" method="post">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">New Member</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="form-group">
-						<label for="Name">Member Name</label>
-						<input type="text" class="form-control" id="Name" name="Name" placeholder="John Smith" />
-					</div>
-					<div class="form-group">
-						<label for="Email">Email Address</label>
-						<input type="email" class="form-control" id="Email" name="Email" placeholder="you@awesome.com" />
-					</div>
-				</div>
-				<div class="modal-footer">
-					<input type="submit" class="btn btn-primary" value="Save" />
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</form>
-	</div>
+<div class="modal fade" id="EditMemberModal">
+	<div id="memberModalContent"></div>
 </div>
 
 <script type="text/javascript">
-	$(document).ready(function () {
-		$("#NewMemberForm").ajaxForm({
-			success: function (formData, jqForm, options) {
-				// sure would be nice if we didn't have to reload the whole page...
-				document.location.reload();
+	const editMember = (id) => {
+		const options = { "backdrop": "static", keyboard: true };
+		$.ajax({
+			type: "GET",
+			url: "/Members/Details",
+			contentType: "application/json; charset=utf-8",
+			data: { "Id": id },
+			datatype: "json",
+			success: function (data, status, jqXhr) {
+				$("#memberModalContent").html(data);
+				$("#EditMemberModal").modal(options);
+				$("#EditMemberModal").modal("show");
+				attachFormHandler();
+			},
+			error: function (jqXhr, status, err) {
+				alert("Failed to load details: " + err);
 			}
 		});
-	});
+	}
+
+	const attachFormHandler = () => {
+		$("#EditMemberForm").ajaxForm({
+			success: function (data, status, jqXhr) {
+				$("#MembersList").html(data);
+				$("#EditMemberModal").modal("hide");
+				alert("Saved successfully!"); // a toast would be better, just tell the user we actually did something
+			},
+			error: function (err) {
+				alert("Failed to save member: " + err);
+			}
+		});
+	}
 </script>
