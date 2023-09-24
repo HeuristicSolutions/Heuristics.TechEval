@@ -6,62 +6,146 @@
 
 <h1>Member List</h1>
 
-<button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#NewMemberModal">Add Member</button>
+<button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#NewMemberModal" id="addMemberBtn">Add Member</button>
 <table class="table table-striped table-bordered table-hover">
-	<thead>
-		<tr>
-			<th scope="col">#</th>
-			<th scope="col">Name</th>
-			<th scope="col">Email</th>
-		</tr>
-	</thead>
-	<tbody>
-	@foreach (var member in Model) {
-		<tr>
-			<th scope="row">@member.Id</th>
-			<td>@member.Name</td>
-			<td>@member.Email</td>
-		</tr>
-	}
-	</tbody>
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var member in Model)
+        {
+            <tr>
+                <th scope="row">@member.Id</th>
+                <td>@member.Name</td>
+                <td>@member.Email</td>
+                <td>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#EditMemberModal" data-id="@member.Id" data-name="@member.Name" data-email="@member.Email">Edit</button>
+                </td>
+            </tr>
+        }
+    </tbody>
 </table>
 
 <div class="modal fade" id="NewMemberModal">
-	<div class="modal-dialog" role="document">
-		<form id="NewMemberForm" action="/Members/New" method="post">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">New Member</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="form-group">
-						<label for="Name">Member Name</label>
-						<input type="text" class="form-control" id="Name" name="Name" placeholder="John Smith" />
-					</div>
-					<div class="form-group">
-						<label for="Email">Email Address</label>
-						<input type="email" class="form-control" id="Email" name="Email" placeholder="you@awesome.com" />
-					</div>
-				</div>
-				<div class="modal-footer">
-					<input type="submit" class="btn btn-primary" value="Save" />
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</form>
-	</div>
+    <div class="modal-dialog" role="document">
+        <form id="NewMemberForm" action="/Members/New" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Member</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="Name">Member Name</label>
+                        <input type="text" class="form-control" id="Name" name="Name" placeholder="John Smith" required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="Email">Email Address</label>
+                        <input type="email" class="form-control" id="Email" name="Email" placeholder="you@awesome.com" required />
+                        <div id="NewModelErrorMessage" style="color: red;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-primary" value="Save" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="EditMemberModal">
+    <div class="modal-dialog" role="document">
+        <form id="EditMemberForm" action="/Members/Update" method="post">
+            <input type="hidden" id="EditMemberId" name="Id" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Member</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="EditName">Member Name</label>
+                        <input type="text" class="form-control" id="EditName" name="Name" placeholder="John Smith" required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="EditEmail">Email Address</label>
+                        <input type="email" class="form-control" id="EditEmail" name="Email" placeholder="you@awesome.com" required />
+                        <div id="EditModelErrorMessage" style="color: red;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-primary" value="Save" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script type="text/javascript">
-	$(document).ready(function () {
-		$("#NewMemberForm").ajaxForm({
-			success: function (formData, jqForm, options) {
-				// sure would be nice if we didn't have to reload the whole page...
-				document.location.reload();
-			}
-		});
-	});
+    $(document).ready(function () {
+        function setupFormValidation(formId) {
+            $(formId).submit(function (e) {
+                var emailField = $(this).find("#Email");
+                var emailValue = emailField.val();
+                var emailErrorMessage = emailField.siblings(".error-message");
+
+                // Check if the form is valid
+                if (!this.checkValidity()) {
+                    e.preventDefault(); // Prevent form submission if it's invalid
+                    // Display custom error messages
+                    $(this).find(':invalid').each(function () {
+                        $(this).next('.error-message').remove(); // Remove any existing error messages
+                        var errorMessage = '<div class="error-message">' + $(this).prop('title') + '</div>';
+                        $(this).after(errorMessage);
+                    });
+                }
+            });
+        }
+
+        $("#NewMemberForm").ajaxForm({
+            success: function (formData, jqForm, options) {
+                $("#NewModelErrorMessage").text("");
+                 document.location.reload();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $("#NewModelErrorMessage").text(errorThrown);
+            }
+        });
+
+        $("#EditMemberForm").ajaxForm({
+            success: function (formData, jqForm, options) {
+                $("#EditModelErrorMessage").text("");
+                document.location.reload();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $("#EditModelErrorMessage").text(errorThrown);
+            }
+        });
+
+        setupFormValidation("#NewMemberForm");
+        setupFormValidation("#EditMemberForm");
+
+        $("button[data-target='#EditMemberModal']").click(function () {
+            var memberId = $(this).data("id");
+            var memberName = $(this).data("name");
+            var memberEmail = $(this).data("email");
+
+            $("#EditMemberId").val(memberId);
+            $("#EditName").val(memberName);
+            $("#EditEmail").val(memberEmail);
+        });
+    });
+
+
 </script>
