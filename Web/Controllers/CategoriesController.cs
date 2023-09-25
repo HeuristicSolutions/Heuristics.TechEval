@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using Heuristics.TechEval.Core;
+using Heuristics.TechEval.Core.Models;
+using System.Linq;
 using System.Web.Mvc;
-using Heuristics.TechEval.Core;
 
-namespace Heuristics.TechEval.Web.Controllers {
+namespace Heuristics.TechEval.Web.Controllers
+{
 
-	public class CategoriesController : Controller {
+    public class CategoriesController : Controller {
 
 		private readonly DataContext _context;
 
@@ -12,10 +14,21 @@ namespace Heuristics.TechEval.Web.Controllers {
 			_context = new DataContext();
 		}
 
-		public ActionResult List() {
-			var categories = _context.Categories.ToList();
+		public ActionResult CategoryList()
+        {
 
-			return View(categories);
+            var memberCounts = _context.Members
+                .GroupBy(m => m.CategoryId)
+                .Select(g => new { Id = g.Key, MemberCount = g.Count() });
+
+            var categoryWithCount = _context.Categories.Join(
+                memberCounts, 
+                c => c.Id, 
+                c => c.Id,
+                (c, mc) => new CategoriesWithCount { Id = c.Id, Name = c.Name, MemberCount = mc.MemberCount }
+                ).ToList();
+
+			return View(categoryWithCount);
 		}
 	}
 }

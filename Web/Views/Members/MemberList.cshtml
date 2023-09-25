@@ -1,30 +1,38 @@
-﻿@model List<Heuristics.TechEval.Core.Models.Member>
+﻿@model Heuristics.TechEval.Core.Models.MemberListViewModel
 
 @{
     ViewBag.Title = "Members";
 }
 
+<link rel="stylesheet" type="text/css" href="\Styles\MemberListStyle.css" />
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+
+
+
 <h1>Member List</h1>
 
 <button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#NewMemberModal" id="addMemberBtn">Add Member</button>
-<table class="table table-striped table-bordered table-hover">
+<table id="MemberTable" class="table table-striped table-bordered table-hover table-sortable">
     <thead>
         <tr>
-            <th scope="col">#</th>
-            <th scope="col">Name</th>
-            <th scope="col">Email</th>
+            <th scope="col" class="sortable" data-sort="id">ID</th>
+            <th scope="col" class="sortable" data-sort="name">Name</th>
+            <th scope="col" class="sortable" data-sort="email">Email</th>
+            <th scope="col" class="sortable" data-sort="category">Category</th>
             <th scope="col">Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var member in Model)
+        @foreach (var member in Model.Members)
         {
             <tr>
                 <th scope="row">@member.Id</th>
                 <td>@member.Name</td>
                 <td>@member.Email</td>
+                <td>@member.Category.Name</td>
                 <td>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#EditMemberModal" data-id="@member.Id" data-name="@member.Name" data-email="@member.Email">Edit</button>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#EditMemberModal" data-id="@member.Id" data-name="@member.Name" data-email="@member.Email" data-category="@member.Category.Name">Edit</button>
                 </td>
             </tr>
         }
@@ -44,12 +52,21 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="Name">Member Name</label>
-                        <input type="text" class="form-control" id="Name" name="Name" placeholder="John Smith" required/>
+                        <input type="text" class="form-control" id="Name" name="Name" placeholder="John Smith" required />
                     </div>
                     <div class="form-group">
                         <label for="Email">Email Address</label>
                         <input type="email" class="form-control" id="Email" name="Email" placeholder="you@awesome.com" required />
                         <div id="NewModelErrorMessage" style="color: red;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="NewCategory">Category</label><br>
+                        <select id="NewCategory" name="CategoryId" required>
+                            @foreach (var category in Model.Categories)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -64,7 +81,7 @@
 <div class="modal fade" id="EditMemberModal">
     <div class="modal-dialog" role="document">
         <form id="EditMemberForm" action="/Members/Update" method="post">
-            <input type="hidden" id="EditMemberId" name="Id" />
+            <input type="hidden" id="EditId" name="Id" />
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Member</h5>
@@ -75,12 +92,21 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="EditName">Member Name</label>
-                        <input type="text" class="form-control" id="EditName" name="Name" placeholder="John Smith" required/>
+                        <input type="text" class="form-control" id="EditName" name="Name" placeholder="John Smith" required />
                     </div>
                     <div class="form-group">
                         <label for="EditEmail">Email Address</label>
                         <input type="email" class="form-control" id="EditEmail" name="Email" placeholder="you@awesome.com" required />
                         <div id="EditModelErrorMessage" style="color: red;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="EditCategory">Category</label><br>
+                        <select id="EditCategory" name="CategoryId" required>
+                            @foreach (var category in Model.Categories)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -92,8 +118,17 @@
     </div>
 </div>
 
+
+
 <script type="text/javascript">
     $(document).ready(function () {
+
+        // This sets up pagination, sorting and filtering to the table by utilizing an open source package
+        $('#MemberTable').DataTable({
+            "order": [[1, "asc"]]
+        });
+
+        // Validation to prevent the submission of empty data
         function setupFormValidation(formId) {
             $(formId).submit(function (e) {
                 var emailField = $(this).find("#Email");
@@ -112,17 +147,20 @@
                 }
             });
         }
+        setupFormValidation("#NewMemberForm");
+        setupFormValidation("#EditMemberForm");
 
+        // Validation to notify the user that the email used is already in place
         $("#NewMemberForm").ajaxForm({
             success: function (formData, jqForm, options) {
                 $("#NewModelErrorMessage").text("");
-                 document.location.reload();
+                document.location.reload();
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 $("#NewModelErrorMessage").text(errorThrown);
             }
         });
-
+        // Validation to notify the user that the email used is already in place
         $("#EditMemberForm").ajaxForm({
             success: function (formData, jqForm, options) {
                 $("#EditModelErrorMessage").text("");
@@ -133,19 +171,44 @@
             }
         });
 
-        setupFormValidation("#NewMemberForm");
-        setupFormValidation("#EditMemberForm");
-
+        // When opening up the Edit Modal, the data displayed will be present in the text boxes and menu selection
         $("button[data-target='#EditMemberModal']").click(function () {
             var memberId = $(this).data("id");
             var memberName = $(this).data("name");
             var memberEmail = $(this).data("email");
+            var memberCategory = $(this).data("category");
 
-            $("#EditMemberId").val(memberId);
+            $("#EditId").val(memberId);
             $("#EditName").val(memberName);
             $("#EditEmail").val(memberEmail);
+
+            // Set the current category value in the data-current-category attribute
+            $("#EditCategory").attr("data-current-category", memberCategory);
+
+            // Update the selected option based on the current category value
+            $("#EditCategory option").each(function () {
+                if ($(this).text() === memberCategory) {
+                    $(this).attr("selected", "selected");
+                } else {
+                    $(this).removeAttr("selected");
+                }
+            });
         });
     });
 
+
+    $("button[data-target='#NewMemberModal']").click(function () {
+        // Set the data-current-category attribute to "Select A Category"
+        $("#NewCategory").attr("data-current-category", "Select A Category");
+
+        // Update the selected option based on the current category value
+        $("#NewCategory option").each(function () {
+            if ($(this).text() === "Select A Category") {
+                $(this).attr("selected", "selected");
+            } else {
+                $(this).removeAttr("selected");
+            }
+        });
+    });
 
 </script>

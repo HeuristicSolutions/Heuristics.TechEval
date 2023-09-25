@@ -1,19 +1,20 @@
-﻿using System.Web.Mvc;
-using System.Data.SqlClient;
+﻿using Heuristics.TechEval.Core;
 using Heuristics.TechEval.Web.Controllers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Heuristics.TechEval.Core;
 using Heuristics.TechEval.Web.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Data.Common;
 using System.Data.Entity;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Web.Mvc;
 
-namespace Heuristics.TechEval.Tests.Controllers {
+namespace Heuristics.TechEval.Tests.Controllers
+{
 
     /*
      * Integration Tests for Member Controller
      */
-	[TestClass]
+    [TestClass]
 	public class MembersControllerTest {
         private MembersController _membersController;
         private DbConnection _connection;
