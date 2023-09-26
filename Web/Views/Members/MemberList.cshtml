@@ -11,7 +11,7 @@
 
 <h1>Member List</h1>
 
-<button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#NewMemberModal" id="addMemberBtn">Add Member</button>
+<button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#MemberModal" id="addMemberBtn">Add Member</button>
 <table id="MemberTable" class="table table-striped table-bordered table-hover table-sortable">
     <thead>
         <tr>
@@ -31,36 +31,44 @@
                 <td>@member.Email</td>
                 <td>@member.Category.Name</td>
                 <td>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#EditMemberModal" data-id="@member.Id" data-name="@member.Name" data-email="@member.Email" data-category="@member.Category.Name">Edit</button>
+                    <button type="button" 
+                            class="btn btn-primary edit-member-btn" 
+                            data-toggle="modal" 
+                            data-target="#MemberModal" 
+                            data-id="@member.Id" 
+                            data-name="@member.Name" 
+                            data-email="@member.Email" 
+                            data-category="@member.Category.Name">Edit</button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
-<div class="modal fade" id="NewMemberModal">
+<div class="modal fade" id="MemberModal">
     <div class="modal-dialog" role="document">
-        <form id="NewMemberForm" action="/Members/New" method="post">
+        <form id="MemberForm" action="" method="post">
+            <input type="hidden" id="MemberId" name="Id" />
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">New Member</h5>
+                    <h5 class="modal-title"></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="Name">Member Name</label>
-                        <input type="text" class="form-control" id="Name" name="Name" placeholder="John Smith" required />
+                        <label for="MemberName">Member Name</label>
+                        <input type="text" class="form-control" id="MemberName" name="Name" placeholder="John Smith" required />
                     </div>
                     <div class="form-group">
-                        <label for="Email">Email Address</label>
-                        <input type="email" class="form-control" id="Email" name="Email" placeholder="you@awesome.com" required />
-                        <div id="NewModelErrorMessage" style="color: red;"></div>
+                        <label for="MemberEmail">Email Address</label>
+                        <input type="email" class="form-control" id="MemberEmail" name="Email" placeholder="you@awesome.com" required />
+                        <div id="MemberModelErrorMessage" style="color: red;"></div>
                     </div>
                     <div class="form-group">
-                        <label for="NewCategory">Category</label><br>
-                        <select id="NewCategory" name="CategoryId" required>
+                        <label for="MemberCategory">Category</label><br>
+                        <select id="MemberCategory" name="CategoryId" required>
                             @foreach (var category in Model.Categories)
                             {
                                 <option value="@category.Id">@category.Name</option>
@@ -77,45 +85,6 @@
     </div>
 </div>
 
-<div class="modal fade" id="EditMemberModal">
-    <div class="modal-dialog" role="document">
-        <form id="EditMemberForm" action="/Members/Update" method="post">
-            <input type="hidden" id="EditId" name="Id" />
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Member</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="EditName">Member Name</label>
-                        <input type="text" class="form-control" id="EditName" name="Name" placeholder="John Smith" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="EditEmail">Email Address</label>
-                        <input type="email" class="form-control" id="EditEmail" name="Email" placeholder="you@awesome.com" required />
-                        <div id="EditModelErrorMessage" style="color: red;"></div>
-                    </div>
-                    <div class="form-group">
-                        <label for="EditCategory">Category</label><br>
-                        <select id="EditCategory" name="CategoryId" required>
-                            @foreach (var category in Model.Categories)
-                            {
-                                <option value="@category.Id">@category.Name</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <input type="submit" class="btn btn-primary" value="Save" />
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
 
 
 
@@ -130,9 +99,6 @@
         // Validation to prevent the submission of empty data
         function setupFormValidation(formId) {
             $(formId).submit(function (e) {
-                var emailField = $(this).find("#Email");
-                var emailValue = emailField.val();
-                var emailErrorMessage = emailField.siblings(".error-message");
 
                 // Check if the form is valid
                 if (!this.checkValidity()) {
@@ -146,66 +112,51 @@
                 }
             });
         }
-        setupFormValidation("#NewMemberForm");
-        setupFormValidation("#EditMemberForm");
 
-        // Validation to notify the user that the email used is already in place
-        $("#NewMemberForm").ajaxForm({
-            success: function (formData, jqForm, options) {
-                $("#NewModelErrorMessage").text("");
-                document.location.reload();
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                $("#NewModelErrorMessage").text(errorThrown);
-            }
-        });
-        // Validation to notify the user that the email used is already in place
-        $("#EditMemberForm").ajaxForm({
-            success: function (formData, jqForm, options) {
-                $("#EditModelErrorMessage").text("");
-                document.location.reload();
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                $("#EditModelErrorMessage").text(errorThrown);
-            }
-        });
-
-        // When opening up the Edit Modal, the data displayed will be present in the text boxes and menu selection
-        $("button[data-target='#EditMemberModal']").click(function () {
+        $(".edit-member-btn").click(function () {
             var memberId = $(this).data("id");
             var memberName = $(this).data("name");
             var memberEmail = $(this).data("email");
             var memberCategory = $(this).data("category");
+            $("#MemberModelErrorMessage").text("");
 
-            $("#EditId").val(memberId);
-            $("#EditName").val(memberName);
-            $("#EditEmail").val(memberEmail);
+            // Set the form fields and title for editing
+            $("#MemberId").val(memberId);
+            $("#MemberName").val(memberName);
+            $("#MemberEmail").val(memberEmail);
 
             // Set the current category value in the data-current-category attribute
-            $("#EditCategory").attr("data-current-category", memberCategory);
-
+            $("#MemberCategory").attr("data-current-category", memberCategory);
             // Update the selected option based on the current category value
-            $("#EditCategory option").each(function () {
+            $("#MemberCategory option").each(function () {
                 if ($(this).text() === memberCategory) {
                     $(this).attr("selected", "selected");
                 } else {
                     $(this).removeAttr("selected");
                 }
             });
+            $("#MemberModal .modal-title").text("Edit Member");
+            $("#MemberForm").attr("action", "/Members/Update"); // Set the form action
         });
-    });
 
+        $("#addMemberBtn").click(function () {
+            $("#MemberModelErrorMessage").text("");
+            $("#MemberForm")[0].reset(); // Clear the form
+            $("#MemberModal .modal-title").text("New Member");
+            $("#MemberForm").attr("action", "/Members/New"); // Set the form action
+        });
 
-    $("button[data-target='#NewMemberModal']").click(function () {
-        // Set the data-current-category attribute to "Select A Category"
-        $("#NewCategory").attr("data-current-category", "Select A Category");
+        setupFormValidation("#NewMemberForm");
+        setupFormValidation("#EditMemberForm");
 
-        // Update the selected option based on the current category value
-        $("#NewCategory option").each(function () {
-            if ($(this).text() === "Select A Category") {
-                $(this).attr("selected", "selected");
-            } else {
-                $(this).removeAttr("selected");
+        // Validation to notify the user that the email used is already in place
+        $("#MemberForm").ajaxForm({
+            success: function (formData, jqForm, options) {
+                $("#MemberModelErrorMessage").text("");
+                document.location.reload();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $("#MemberModelErrorMessage").text(errorThrown);
             }
         });
     });

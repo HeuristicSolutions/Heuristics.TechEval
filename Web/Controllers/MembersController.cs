@@ -76,7 +76,7 @@ namespace Heuristics.TechEval.Web.Controllers
             _context.Members.Add(newMember);
 			_context.SaveChanges();
 
-			return RedirectToAction("List");
+			return RedirectToAction("MemberList");
         }
 
 		[HttpPost]
@@ -98,7 +98,7 @@ namespace Heuristics.TechEval.Web.Controllers
             member.Email = data.Email;
             member.CategoryId = data.CategoryId;
             _context.SaveChanges();
-            return RedirectToAction("List");
+            return RedirectToAction("MemberList");
         }
 	}
 }
