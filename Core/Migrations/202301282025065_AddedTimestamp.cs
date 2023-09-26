@@ -1,8 +1,7 @@
 ﻿namespace Heuristics.TechEval.Core.Migrations
 {
-    using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class AddedTimestamp : DbMigration
     {
         public override void Up()

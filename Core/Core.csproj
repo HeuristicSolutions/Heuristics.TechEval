@@ -55,8 +55,11 @@
     <Compile Include="Migrations\202301282025065_AddedTimestamp.designer.cs">
       <DependentUpon>202301282025065_AddedTimestamp.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\CategoriesWithCount.cs" />
     <Compile Include="Models\Category.cs" />
     <Compile Include="DataContext.cs" />
+    <Compile Include="Models\MemberListViewModel.cs" />
+    <Compile Include="Models\MemberWithCategory.cs" />
     <Compile Include="Models\Member.cs" />
     <Compile Include="Migrations\201711142244515_Initial.cs" />
     <Compile Include="Migrations\201711142244515_Initial.Designer.cs">

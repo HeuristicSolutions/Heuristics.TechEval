@@ -1,0 +1,163 @@
+﻿@model Heuristics.TechEval.Core.Models.MemberListViewModel
+
+@{
+    ViewBag.Title = "Members";
+}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+
+
+
+<h1>Member List</h1>
+
+<button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#MemberModal" id="addMemberBtn">Add Member</button>
+<table id="MemberTable" class="table table-striped table-bordered table-hover table-sortable">
+    <thead>
+        <tr>
+            <th scope="col" class="sortable" data-sort="id">ID</th>
+            <th scope="col" class="sortable" data-sort="name">Name</th>
+            <th scope="col" class="sortable" data-sort="email">Email</th>
+            <th scope="col" class="sortable" data-sort="category">Category</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var member in Model.Members)
+        {
+            <tr>
+                <th scope="row">@member.Id</th>
+                <td>@member.Name</td>
+                <td>@member.Email</td>
+                <td>@member.Category.Name</td>
+                <td>
+                    <button type="button" 
+                            class="btn btn-primary edit-member-btn" 
+                            data-toggle="modal" 
+                            data-target="#MemberModal" 
+                            data-id="@member.Id" 
+                            data-name="@member.Name" 
+                            data-email="@member.Email" 
+                            data-category="@member.Category.Name">Edit</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="modal fade" id="MemberModal">
+    <div class="modal-dialog" role="document">
+        <form id="MemberForm" action="" method="post">
+            <input type="hidden" id="MemberId" name="Id" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="MemberName">Member Name</label>
+                        <input type="text" class="form-control" id="MemberName" name="Name" placeholder="John Smith" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="MemberEmail">Email Address</label>
+                        <input type="email" class="form-control" id="MemberEmail" name="Email" placeholder="you@awesome.com" required />
+                        <div id="MemberModelErrorMessage" style="color: red;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="MemberCategory">Category</label><br>
+                        <select id="MemberCategory" name="CategoryId" required>
+                            @foreach (var category in Model.Categories)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-primary" value="Save" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        // This sets up pagination, sorting and filtering to the table by utilizing an open source package
+        $('#MemberTable').DataTable({
+            "order": [[1, "asc"]]
+        });
+
+        // Validation to prevent the submission of empty data
+        function setupFormValidation(formId) {
+            $(formId).submit(function (e) {
+
+                // Check if the form is valid
+                if (!this.checkValidity()) {
+                    e.preventDefault(); // Prevent form submission if it's invalid
+                    // Display custom error messages
+                    $(this).find(':invalid').each(function () {
+                        $(this).next('.error-message').remove(); // Remove any existing error messages
+                        var errorMessage = '<div class="error-message">' + $(this).prop('title') + '</div>';
+                        $(this).after(errorMessage);
+                    });
+                }
+            });
+        }
+
+        $(".edit-member-btn").click(function () {
+            var memberId = $(this).data("id");
+            var memberName = $(this).data("name");
+            var memberEmail = $(this).data("email");
+            var memberCategory = $(this).data("category");
+            $("#MemberModelErrorMessage").text("");
+
+            // Set the form fields and title for editing
+            $("#MemberId").val(memberId);
+            $("#MemberName").val(memberName);
+            $("#MemberEmail").val(memberEmail);
+
+            // Set the current category value in the data-current-category attribute
+            $("#MemberCategory").attr("data-current-category", memberCategory);
+            // Update the selected option based on the current category value
+            $("#MemberCategory option").each(function () {
+                if ($(this).text() === memberCategory) {
+                    $(this).attr("selected", "selected");
+                } else {
+                    $(this).removeAttr("selected");
+                }
+            });
+            $("#MemberModal .modal-title").text("Edit Member");
+            $("#MemberForm").attr("action", "/Members/Update"); // Set the form action
+        });
+
+        $("#addMemberBtn").click(function () {
+            $("#MemberModelErrorMessage").text("");
+            $("#MemberForm")[0].reset(); // Clear the form
+            $("#MemberModal .modal-title").text("New Member");
+            $("#MemberForm").attr("action", "/Members/New"); // Set the form action
+        });
+
+        setupFormValidation("#MemberForm");
+
+        // Validation to notify the user that the email used is already in place
+        $("#MemberForm").ajaxForm({
+            success: function (formData, jqForm, options) {
+                $("#MemberModelErrorMessage").text("");
+                document.location.reload();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                $("#MemberModelErrorMessage").text(errorThrown);
+            }
+        });
+    });
+
+</script>

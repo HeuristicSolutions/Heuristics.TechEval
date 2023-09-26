@@ -1,10 +1,11 @@
-﻿using System.Web.Mvc;
-using Heuristics.TechEval.Web.Controllers;
+﻿using Heuristics.TechEval.Web.Controllers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Web.Mvc;
 
-namespace Heuristics.TechEval.Tests.Controllers {
+namespace Heuristics.TechEval.Tests.Controllers
+{
 
-	[TestClass]
+    [TestClass]
 	public class HomeControllerTest {
 
 		[TestMethod]

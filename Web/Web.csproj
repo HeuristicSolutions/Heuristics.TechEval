@@ -217,11 +217,11 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Members\List.cshtml" />
     <Content Include="Views\Home\Requirements.cshtml" />
-    <Content Include="Views\Categories\List.cshtml" />
     <Content Include="Views\Home\Setup.cshtml" />
     <Content Include="Scripts\jquery.form.min.js.map" />
+    <Content Include="Views\Members\MemberList.cshtml" />
+    <Content Include="Views\Categories\CategoryList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

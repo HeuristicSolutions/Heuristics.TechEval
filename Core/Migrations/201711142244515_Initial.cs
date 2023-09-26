@@ -2,7 +2,7 @@ using System.Data.Entity.Migrations;
 
 namespace Heuristics.TechEval.Core.Migrations
 {
-	public partial class Initial : DbMigration
+    public partial class Initial : DbMigration
     {
         public override void Up()
         {
