@@ -146,8 +146,7 @@
             $("#MemberForm").attr("action", "/Members/New"); // Set the form action
         });
 
-        setupFormValidation("#NewMemberForm");
-        setupFormValidation("#EditMemberForm");
+        setupFormValidation("#MemberForm");
 
         // Validation to notify the user that the email used is already in place
         $("#MemberForm").ajaxForm({

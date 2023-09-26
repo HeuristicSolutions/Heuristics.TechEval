@@ -59,8 +59,7 @@ namespace Heuristics.TechEval.Web.Controllers
 		[HttpPost]
 		public ActionResult New(NewMember data)
         {
-            var duplicateEmails = _context.Members.Where(m => m.Email == data.Email).ToList();
-			if (duplicateEmails.Any())
+			if (_context.Members.Where(m => m.Email == data.Email).ToList().Any())
 			{
 				return new HttpStatusCodeResult(System.Net.HttpStatusCode.Conflict, $"Email {data.Email} already in use");
 			}
